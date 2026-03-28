@@ -30,4 +30,10 @@ def generate_password(length = 12, use_letters = True, use_digits = True, use_sp
 
     return ''.join(password_chars)
 
+def generate_login():
+    random_digits = ''.join(secrets.choice(string.digits) for _ in range(6))
+    return f"student_{random_digits}"
+
+def generate_student_number():
+    return int(''.join(secrets.choice(string.digits) for _ in range(8)))
 
