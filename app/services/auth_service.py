@@ -10,7 +10,7 @@ def authenticate_teacher(db: Session, username: str, password: str):
     teacher = db.query(Teacher).filter(Teacher.email == username).first()
     if not teacher:
         return None
-    if not verify_password(password, Teacher.hashed_password):
+    if not verify_password(password, teacher.hashed_password):
         return None
     return teacher
 
@@ -18,7 +18,7 @@ def authenticate_student(db: Session, username: str, password: str):
     student = db.query(Student).filter(Student.login == username).first()
     if not student:
         return None
-    if not verify_password(password, Student.hashed_password):
+    if not verify_password(password, student.hashed_password):
         return None
     return student
 
