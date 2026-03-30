@@ -19,3 +19,10 @@ class StudentRegistrationResponse(BaseModel):
     student_number: int
     password: str
     message: str
+
+class StudentResultsResponse(BaseModel):
+    test_id: int
+    test_title: str
+    total_points: float
+    max_points: float
+    result: str
