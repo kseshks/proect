@@ -7,7 +7,7 @@ from app.schemas.auth import Token
 
 
 def authenticate_teacher(db: Session, username: str, password: str):
-    teacher = db.query(Teacher).filter(Teacher.email == username).first()
+    teacher: Teacher | None = db.query(Teacher).filter(Teacher.email == username).first()
     if not teacher:
         return None
     if not verify_password(password, teacher.hashed_password):
@@ -15,14 +15,14 @@ def authenticate_teacher(db: Session, username: str, password: str):
     return teacher
 
 def authenticate_student(db: Session, username: str, password: str):
-    student = db.query(Student).filter(Student.login == username).first()
+    student: Student | None = db.query(Student).filter(Student.login == username).first()
     if not student:
         return None
     if not verify_password(password, student.hashed_password):
         return None
     return student
 
-def log_in(db: Session, username: str, password: str) -> Token:
+def login(db: Session, username: str, password: str) -> Token:
     teacher = authenticate_teacher(db, username, password)
     if teacher:
         access_token = create_access_token(

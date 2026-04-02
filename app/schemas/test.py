@@ -2,9 +2,22 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+from app.schemas import QuestionResponse, QuestionCreate
+
 
 class TestBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
+
+class TestWithQuestionsCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    questions: List[QuestionCreate] = []
+
+class TestWithQuestionsResponse(BaseModel):
+    id: int
+    title: str
+    questions_count: int
+    total_points: float
+    message: str = "Тест успешно создан"
 
 class TestCreate(TestBase):
     pass

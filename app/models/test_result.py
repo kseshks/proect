@@ -10,6 +10,7 @@ class TestResult(Base):
     student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
     test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
     total_points = Column(Float, default=0.0)
+    max_points = Column(Float, default=0.0)
 
     student = relationship("Student", back_populates="test_results")
     test = relationship("Test", back_populates="test_results")
