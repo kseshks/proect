@@ -1,0 +1,14 @@
+
+.nav-links {
+    margin-bottom: 20px;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.button-group button {
+    flex: 1;
+}
