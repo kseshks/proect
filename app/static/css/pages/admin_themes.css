@@ -1,0 +1,26 @@
+
+.theme-actions-list {
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 8px;
+}
+
+.theme-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.theme-item:last-child {
+    border-bottom: none;
+}
+
+.theme-item span {
+    font-size: 14px;
+    color: #334155;
+}

@@ -1,0 +1,436 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+/* Навигационная панель */
+.navbar {
+    background: white;
+    padding: 20px 32px;
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-radius: 40px;
+    transition: all 0.2s ease;
+}
+
+.nav-btn.active {
+    background: #3b82f6;
+    color: white;
+}
+
+.nav-btn:hover:not(.active) {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.logout-nav-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background 0.2s;
+}
+
+.logout-nav-btn:hover {
+    background: #dc2626;
+}
+
+/* Секции */
+.section {
+    display: none;
+    padding: 32px;
+    animation: fadeIn 0.3s ease;
+}
+
+.section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 24px;
+}
+
+/* Кнопки действий */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.action-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.action-btn:hover {
+    background: #2563eb;
+}
+
+.download-btn {
+    background: #10b981;
+}
+
+.download-btn:hover {
+    background: #059669;
+}
+
+/* Список учеников/учителей */
+.list-container {
+    background: #f8fafc;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+    transition: background 0.2s;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item:hover {
+    background: #f8fafc;
+}
+
+.list-item-info {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.list-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.list-item-btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.info-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.info-btn:hover {
+    background: #2563eb;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* Сетка тем */
+.themes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.theme-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.theme-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.theme-name {
+    font-weight: 500;
+    color: #1e293b;
+    font-size: 15px;
+}
+
+.delete-theme-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.delete-theme-btn:hover {
+    background: #dc2626;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: white;
+    padding: 32px;
+    border-radius: 32px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-content h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 20px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 60px;
+    font-size: 15px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-confirm {
+    background: #3b82f6;
+    color: white;
+}
+
+.modal-confirm:hover {
+    background: #2563eb;
+}
+
+.modal-cancel {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.modal-cancel:hover {
+    background: #e2e8f0;
+}
+
+.modal-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.modal-danger:hover {
+    background: #dc2626;
+}
+
+/* Список тем учителя в модалке */
+.teacher-themes-list {
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.teacher-theme-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.teacher-theme-item:last-child {
+    border-bottom: none;
+}
+
+.teacher-theme-name {
+    font-size: 14px;
+    color: #334155;
+}
+
+.delete-theme-small {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 48px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .dashboard-container {
+        border-radius: 24px;
+    }
+    
+    .navbar {
+        padding: 16px 20px;
+    }
+    
+    .nav-btn, .logout-nav-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    .section {
+        padding: 20px;
+    }
+    
+    .section h2 {
+        font-size: 20px;
+    }
+    
+    .themes-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        padding: 24px;
+        border-radius: 24px;
+    }
+    
+    .modal-content h3 {
+        font-size: 20px;
+    }
+    
+    .list-item {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .list-item-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

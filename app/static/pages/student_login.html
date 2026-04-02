@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход ученика</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="../css/components/forms.css">
+    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="../css/pages/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <h2>Окно входа ученика</h2>
+            <div class="role-switch">
+                <button class="role-btn" onclick="window.location.href='admin_login.html'">Войти как администратор</button>
+                <button class="role-btn" onclick="window.location.href='teacher_login.html'">Войти как учитель</button>
+            </div>
+            <div class="login-form">
+                <label for="student-id">Введите код ID</label>
+                <input type="text" id="student-id" placeholder="Введите ваш ID" class="form-input">
+                <button class="submit-btn" onclick="window.location.href='student_dashboard.html'">Войти</button>
+            </div>
+            <div class="footer">
+                <p>Made by Vie</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
