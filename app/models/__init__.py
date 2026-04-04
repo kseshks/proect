@@ -1,12 +1,21 @@
+from .admin import Admin
 from .teacher import Teacher
+from .classroom import ClassRoom
 from .student import Student
-from .test import Test
-from .question import Question
-from .answer import Answer
-from .test_result import TestResult
-from .student_answer import StudentAnswer
+from .topic import Topic
+from .topic_material import TopicMaterial
+from .topic_question import TopicQuestion
+from .topic_assignment import TopicAssignment
+from .topic_dialog_message import TopicDialogMessage
 
 __all__ = [
-    "Teacher", "Student", "Test",
-    "Question", "Answer", "TestResult", "StudentAnswer"
+    "Admin",
+    "Teacher",
+    "ClassRoom",
+    "Student",
+    "Topic",
+    "TopicMaterial",
+    "TopicQuestion",
+    "TopicAssignment",
+    "TopicDialogMessage",
 ]

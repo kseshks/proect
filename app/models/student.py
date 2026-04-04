@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -7,8 +7,10 @@ from app.core.database import Base
 class Student(Base):
     __tablename__ = 'students'
     id = Column(Integer, primary_key=True)
-    login = Column(String, unique=True)
+    student_number = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    student_number = Column(Integer, nullable=False, unique=True)
+    class_id = Column(Integer, ForeignKey("classrooms.id"), nullable=False)
 
-    test_results = relationship("TestResult", back_populates="student", cascade="all, delete-orphan")
+    classroom = relationship("ClassRoom", back_populates="students")
+    assignments = relationship("TopicAssignment", back_populates="student", cascade="all, delete-orphan")
+    dialog_messages = relationship("TopicDialogMessage", back_populates="student", cascade="all, delete-orphan")
