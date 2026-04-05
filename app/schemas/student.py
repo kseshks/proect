@@ -1,44 +1,23 @@
-from typing import List
-
 from pydantic import BaseModel, Field
 
-class StudentsBatchCreate(BaseModel):
-    count: int = Field(..., ge=1, le=100, description="Количество учеников для создания")
 
-class StudentRatingResponse(BaseModel):
-    student_number: int
-    total_points: float
-    max_points: float
-    result: str
-    percentage: float
+class StudentsBatchCreateRequest(BaseModel):
+    class_name: str = Field(..., min_length=1, max_length=50)
+    count: int = Field(..., ge=1, le=200)
 
-class TestRatingResponse(BaseModel):
-    test_id: int
-    test_title: str
-    results: List[StudentRatingResponse]
 
-class StudentBase(BaseModel):
-    login: str
-    student_number: int
-
-class StudentCreate(StudentBase):
-    pass
-
-class StudentResponse(StudentBase):
+class StudentResponse(BaseModel):
     id: int
+    student_number: str
+    class_id: int
 
     class Config:
         from_attributes = True
 
-class StudentRegistrationResponse(BaseModel):
-    login: str
-    student_number: int
-    password: str
-    message: str
 
-class StudentResultsResponse(BaseModel):
-    test_id: int
-    test_title: str
-    total_points: float
-    max_points: float
-    result: str
+class StudentCredentialResponse(BaseModel):
+    id: int
+    student_number: str
+    password: str
+    class_id: int
+    class_name: str

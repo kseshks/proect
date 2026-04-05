@@ -38,6 +38,9 @@ def get_teacher_topic_or_404(db: Session, teacher_id: int, topic_id: int) -> Top
         raise HTTPException(status_code=404, detail="Тема не найдена")
     return topic
 
+def get_teacher_topics(db: Session, teacher_id: int) -> list[Topic]:
+    return cast(list[Topic], db.query(Topic).filter(Topic.teacher_id == teacher_id).order_by(Topic.id.desc()).all())
+
 def update_topic(db: Session, teacher_id: int, topic_id: int, data: dict) -> Topic:
     topic = get_teacher_topic_or_404(db, teacher_id, topic_id)
 

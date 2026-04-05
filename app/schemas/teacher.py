@@ -1,22 +1,19 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
-class TeacherBase(BaseModel):
-    email: EmailStr
-    first_name: str
-    last_name: str
+class TeacherBatchGenerateRequest(BaseModel):
+    count: int = Field(1, ge=1, le=100)
 
-class TeacherCreate(TeacherBase):
-    password: str = Field(..., min_length=8)
 
-class TeacherUpdate(BaseModel):
-    email: EmailStr | None = None
-    first_name: str | None = None
-    last_name: str | None = None
-    password: str | None = Field(None, min_length=8)
-
-class TeacherResponse(TeacherBase):
+class TeacherResponse(BaseModel):
     id: int
+    login: str
 
     class Config:
         from_attributes = True
+
+
+class TeacherCredentialResponse(BaseModel):
+    id: int
+    login: str
+    password: str
