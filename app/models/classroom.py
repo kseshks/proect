@@ -12,4 +12,4 @@ class ClassRoom(Base):
     teacher_id = Column(Integer, ForeignKey('teachers.id'), nullable=True)
 
     teacher = relationship("Teacher", back_populates="classes")
-    students = relationship("Student", back_populates="classroom")
+    students = relationship("Student", back_populates="classroom", cascade="all, delete-orphan")

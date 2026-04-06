@@ -53,12 +53,12 @@ class QuestionResponse(BaseModel):
         from_attributes = True
 
 
-class AssignStudentsRequest(BaseModel):
-    student_numbers: list[str]
+from pydantic import BaseModel, Field
 
 
-class AssignClassesRequest(BaseModel):
-    class_ids: list[int]
+class AssignTopicRequest(BaseModel):
+    class_ids: list[int] = Field(default_factory=list)
+    student_numbers: list[str] = Field(default_factory=list)
 
 
 class AskQuestionRequest(BaseModel):

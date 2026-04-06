@@ -5,6 +5,9 @@ class StudentsBatchCreateRequest(BaseModel):
     class_name: str = Field(..., min_length=1, max_length=50)
     count: int = Field(..., ge=1, le=200)
 
+class TeacherStudentsGenerateRequest(BaseModel):
+    count: int = Field(..., ge=1, le=200)
+
 
 class StudentResponse(BaseModel):
     id: int

@@ -3,32 +3,35 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import require_teacher
 from app.core.database import get_db
+from app.schemas.student import TeacherStudentsGenerateRequest
 from app.schemas.topic import (
-    AssignClassesRequest,
-    AssignStudentsRequest,
     MaterialLinkCreateRequest,
     QuestionsBatchCreateRequest,
     TopicCreateRequest,
     TopicResponse,
-    TopicUpdateRequest,
+    TopicUpdateRequest, AssignTopicRequest,
 )
 from app.services.teacher_service import (
     add_file_material,
     add_link_material,
     add_topic_questions,
-    assign_topic_to_classes,
-    assign_topic_to_students,
     create_topic,
     delete_topic,
     get_teacher_class_students,
     get_teacher_classes,
     get_teacher_topic_or_404,
     get_topic_questions,
-    update_topic, get_teacher_topics,
+    update_topic, get_teacher_topics, assign_topic, generate_students_for_teacher_class,
 )
 
 router = APIRouter(prefix="/teacher", tags=["teacher"])
 
+@router.get("/ratings/students")
+def teacher_students_rating(teacher=Depends(require_teacher)):
+    return {
+        "items": [],
+        "total": 0
+    }
 
 @router.get("/classes")
 def teacher_classes(db: Session = Depends(get_db), teacher=Depends(require_teacher)):
@@ -115,21 +118,20 @@ def teacher_add_questions(
     )
 
 
-@router.post("/topics/{topic_id}/assign/students")
-def teacher_assign_students(
+@router.post("/topics/{topic_id}/assign")
+def teacher_assign_topic(
     topic_id: int,
-    data: AssignStudentsRequest,
+    data: AssignTopicRequest,
     db: Session = Depends(get_db),
     teacher=Depends(require_teacher)
 ):
-    return assign_topic_to_students(db, teacher, topic_id, data.student_numbers)
+    return assign_topic(db, teacher, topic_id, data.class_ids, data.student_numbers)
 
-
-@router.post("/topics/{topic_id}/assign/classes")
-def teacher_assign_classes(
-    topic_id: int,
-    data: AssignClassesRequest,
+@router.post("/classes/{class_id}/students/generate", status_code=status.HTTP_201_CREATED)
+def teacher_generate_students(
+    class_id: int,
+    data: TeacherStudentsGenerateRequest,
     db: Session = Depends(get_db),
     teacher=Depends(require_teacher)
 ):
-    return assign_topic_to_classes(db, teacher, topic_id, data.class_ids)
+    return generate_students_for_teacher_class(db, teacher.id, class_id, data.count)

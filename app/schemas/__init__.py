@@ -11,11 +11,7 @@ from .topic import (
     QuestionCreateRequest,
     QuestionsBatchCreateRequest,
     QuestionResponse,
-    AssignStudentsRequest,
-    AssignClassesRequest,
-    AssignedStudentResponse,
-    StudentTopicListResponse,
-    StudentTopicDetailResponse,
+    AssignTopicRequest,
     AskQuestionRequest,
     DialogMessageResponse,
 )

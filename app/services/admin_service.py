@@ -1,4 +1,6 @@
-from fastapi import HTTPException
+from typing import cast
+
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash
@@ -83,3 +85,40 @@ def generate_students_for_class(db: Session, class_name: str, count: int) -> dic
         "class_name": classroom.name,
         "students": created
     }
+
+def get_classroom_by_id(db: Session, class_id: int) -> ClassRoom:
+    classroom: ClassRoom = cast(ClassRoom, db.query(ClassRoom).filter(ClassRoom.id == class_id).first())
+    if not classroom:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Класс не найден"
+        )
+    return classroom
+
+
+def delete_classroom(db: Session, class_id: int) -> None:
+    classroom = get_classroom_by_id(db, class_id)
+    db.delete(classroom)
+    db.commit()
+
+
+def delete_student(db: Session, student_id: int) -> None:
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ученик не найден"
+        )
+    db.delete(student)
+    db.commit()
+
+
+def delete_teacher(db: Session, teacher_id: int) -> None:
+    teacher = db.query(Teacher).filter(Teacher.id == teacher_id).first()
+    if not teacher:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Учитель не найден"
+        )
+    db.delete(teacher)
+    db.commit()
