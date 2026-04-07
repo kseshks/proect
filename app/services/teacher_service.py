@@ -340,14 +340,14 @@ def get_topic_assignment_options(db: Session, teacher_id: int, topic_id: int) ->
     return {"classes": result}
 
 
-def assign_topic(
-    db: Session,
-    teacher,
-    topic_id: int,
-    class_ids: list[int],
-    student_numbers: list[str]
-) -> dict:
+def assign_topic(db: Session, teacher, topic_id: int, class_ids: list[int], student_numbers: list[str]) -> dict:
     topic = get_teacher_topic_or_404(db, teacher.id, topic_id)
+
+    if not topic.questions:
+        raise HTTPException(status_code=400, detail="Нельзя назначить тему без вопросов")
+
+    if not topic.materials:
+        raise HTTPException(status_code=400, detail="Нельзя назначить тему без материалов")
 
     student_ids = set()
 
