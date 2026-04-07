@@ -15,7 +15,8 @@ from app.models import (
     TopicMaterial,
     TopicQuestion,
 )
-from app.services.material_processing_service import extract_text_from_url, extract_text_from_file
+from app.services.material_processing_service import extract_text_from_url, extract_text_from_file, validate_file, \
+    MAX_FILE_SIZE_MB
 from app.services.student_generation_service import generate_student_number, generate_password
 
 UPLOAD_DIR = Path("static/uploads/topics")
@@ -221,6 +222,14 @@ def add_link_material(db: Session, teacher_id: int, topic_id: int, title: str | 
 def add_file_material(db: Session, teacher_id: int, topic_id: int, file: UploadFile) -> TopicMaterial:
     topic = get_teacher_topic_or_404(db, teacher_id, topic_id)
 
+    validate_file(file.filename)
+
+    content = file.file.read()
+
+    max_size_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
+    if len(content) > max_size_bytes:
+        raise HTTPException(status_code=400, detail="Файл слишком большой")
+
     topic_dir = UPLOAD_DIR / str(topic.id)
     topic_dir.mkdir(parents=True, exist_ok=True)
 
@@ -228,14 +237,14 @@ def add_file_material(db: Session, teacher_id: int, topic_id: int, file: UploadF
     target_path = topic_dir / filename
 
     with target_path.open("wb") as f:
-        f.write(file.file.read())
+        f.write(content)
 
     material = TopicMaterial(
         topic_id=topic.id,
         material_type="file",
         title=file.filename,
         file_path=str(target_path).replace("\\", "/"),
-        parse_status = "pending"
+        parse_status="pending"
     )
     db.add(material)
     db.flush()

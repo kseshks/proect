@@ -47,5 +47,6 @@ def extract_text_from_url(url: str) -> str:
     for tag in soup(["script", "style", "noscript"]):
         tag.decompose()
 
-    text = soup.get_text(strip=True)
+    text = soup.get_text()
+    text = " ".join(text.split())
     return text

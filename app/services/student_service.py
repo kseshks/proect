@@ -8,7 +8,7 @@ from app.models.topic_assignment import TopicAssignment
 from app.models.topic_dialog_message import TopicDialogMessage
 from app.models.topic_question import TopicQuestion
 from app.models.student import Student
-from app.services.ai_service import generate_answer
+from app.services.ai_service import build_topic_context, build_prompt, call_llm
 
 
 def get_student_topics(db: Session, student_id: int) -> list[dict]:
@@ -63,12 +63,17 @@ def get_student_dialog(db: Session, student: Student, topic_id: int) -> list[Top
 def ask_question(db: Session, student: Student, topic_id: int, question_id: int) -> TopicDialogMessage:
     topic = get_student_topic_or_404(db, student, topic_id)
 
-    question = db.query(TopicQuestion).filter(TopicQuestion.id == question_id, TopicQuestion.topic_id == topic.id,).first()
+    question = db.query(TopicQuestion).filter(
+        TopicQuestion.id == question_id,
+        TopicQuestion.topic_id == topic.id
+    ).first()
 
     if not question:
         raise HTTPException(status_code=404, detail="Вопрос не найден")
 
-    answer = generate_answer(topic, topic.materials, cast(str, question.text))
+    context = build_topic_context(topic)
+    prompt = build_prompt(topic.title, context, cast(str, question.text))
+    answer = call_llm(prompt)
 
     message = TopicDialogMessage(
         topic_id=topic.id,
