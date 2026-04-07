@@ -15,6 +15,7 @@ from app.models import (
     TopicMaterial,
     TopicQuestion,
 )
+from app.services.material_processing_service import extract_text_from_url, extract_text_from_file
 from app.services.student_generation_service import generate_student_number, generate_password
 
 UPLOAD_DIR = Path("static/uploads/topics")
@@ -199,9 +200,19 @@ def add_link_material(db: Session, teacher_id: int, topic_id: int, title: str | 
         topic_id=topic.id,
         material_type="link",
         title=title,
-        url=url
+        url=url,
+        parse_status="pending"
     )
     db.add(material)
+    db.flush()
+
+    try:
+        material.extracted_text = extract_text_from_url(url)
+        material.parse_status = "success"
+    except Exception:
+        material.extracted_text = None
+        material.parse_status = "failed"
+
     db.commit()
     db.refresh(material)
     return material
@@ -223,9 +234,19 @@ def add_file_material(db: Session, teacher_id: int, topic_id: int, file: UploadF
         topic_id=topic.id,
         material_type="file",
         title=file.filename,
-        file_path=str(target_path).replace("\\", "/")
+        file_path=str(target_path).replace("\\", "/"),
+        parse_status = "pending"
     )
     db.add(material)
+    db.flush()
+
+    try:
+        material.extracted_text = extract_text_from_file(str(target_path))
+        material.parse_status = "success"
+    except Exception:
+        material.extracted_text = None
+        material.parse_status = "failed"
+
     db.commit()
     db.refresh(material)
     return material
