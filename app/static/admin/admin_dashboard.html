@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель управления</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin_dashboard_style.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <button class="tab-btn active" data-tab="students">Ученики</button>
+      <button class="tab-btn" data-tab="teachers">Учителя</button>
+    </aside>
+
+    <main class="main-content">
+      
+      <!-- ПАНЕЛЬ УЧЕНИКОВ (КЛАССЫ) -->
+      <div class="tab-panel active" id="students">
+        <div class="list-container">
+          <div class="scrollbar-visual"></div>
+          <div class="cards-wrapper" id="classes-list"></div>
+        </div>
+        <button class="add-btn" onclick="openAddClassModal()">Добавить класс</button>
+      </div>
+
+      <!-- ПАНЕЛЬ УЧИТЕЛЕЙ -->
+      <div class="tab-panel" id="teachers">
+        <div class="list-container">
+          <div class="scrollbar-visual"></div>
+          <div class="cards-wrapper" id="teachers-list"></div>
+        </div>
+        <button class="add-btn" onclick="openAddTeacherModal()">Добавить учителя</button>
+      </div>
+
+      <div class="footer">Made by Vie</div>
+    </main>
+  </div>
+
+  <!-- ==================== МОДАЛЬНЫЕ ОКНА ==================== -->
+
+  <!-- МОДАЛЬНОЕ ОКНО: Информация о классе (список учеников) с кнопкой Скачать -->
+  <div class="modal-overlay" id="class-info-modal">
+    <div class="modal-content">
+      <div class="class-header" id="class-info-header">Класс</div>
+      <div class="students-list-container">
+        <div class="scrollbar-visual"></div>
+        <div class="students-cards-wrapper" id="students-in-class"></div>
+      </div>
+      <button class="add-btn" onclick="openAddStudentsBatchModal()">Добавить ученика</button>
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="closeModal('class-info-modal')">Назад</button>
+        <button class="nav-btn" onclick="downloadClassList()">Скачать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: Добавление учителя -->
+  <div class="modal-overlay" id="add-teacher-modal">
+    <div class="modal-content">
+      <div class="teacher-form-row">
+        <div class="teacher-form-label">Логин учителя</div>
+        <input type="text" class="teacher-form-input" placeholder="Логин учителя" id="teacher-login">
+      </div>
+      <div class="teacher-form-row">
+        <div class="teacher-form-label">Пароль</div>
+        <input type="text" class="teacher-form-input" placeholder="Пароль" id="teacher-password">
+      </div>
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="closeModal('add-teacher-modal')">Назад</button>
+        <button class="nav-btn" onclick="confirmAddTeacher()">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: Добавление класса -->
+  <div class="modal-overlay" id="add-class-modal">
+    <div class="modal-content">
+      <div class="class-header" id="add-class-header">Класс</div>
+      <div class="form-row" style="max-width: 500px; margin: 0 auto 24px;">
+        <input type="text" class="form-input" placeholder="Название класса" id="class-name-input">
+      </div>
+      <div class="form-row" style="max-width: 500px; margin: 0 auto 40px;">
+        <input type="number" class="form-input" placeholder="Количество учеников" id="students-count" min="0" max="50">
+      </div>
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="closeModal('add-class-modal')">Назад</button>
+        <button class="nav-btn" onclick="confirmAddClass()">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО: Добавление учеников в существующий класс -->
+  <div class="modal-overlay" id="add-students-batch-modal">
+    <div class="modal-content">
+      <div class="class-header" id="add-students-header">Класс</div>
+      <div class="form-row" style="max-width: 400px; margin: 0 auto 40px;">
+        <input type="number" class="form-input" placeholder="Количество учеников" id="add-students-count" min="1" max="50">
+      </div>
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="closeModal('add-students-batch-modal')">Назад</button>
+        <button class="nav-btn" onclick="confirmAddStudentsBatch()">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И MOCK-БАЗА ДАННЫХ ====================
+    
+    // Мок-база данных для хранения классов и учителей
+    let mockDB = {
+      classes: [],
+      teachers: []
+    };
+
+    // Текущий выбранный класс (используется в модальных окнах)
+    let currentClassObject = null;
+
+    // ==================== ФУНКЦИИ ДЛЯ РАБОТЫ С ДАННЫМИ ====================
+
+    // Функция: генерация логина и пароля для нового учителя
+    function generateTeacherCredentials() {
+      const teacherNumber = mockDB.teachers.length + 1;
+      const login = `Учитель ${teacherNumber}`;
+      const password = Math.floor(Math.random() * 900000000) + 100000000;
+      return { login, password: password.toString() };
+    }
+
+    // Функция: загрузка данных из localStorage или создание начальных данных
+    function loadMockData() {
+      const saved = localStorage.getItem('school_admin_mock');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.classes && parsed.teachers) {
+            mockDB = parsed;
+          }
+        } catch(e) { console.warn(e); }
+      }
+      
+      // Если классов нет, создаём начальные (моковые) данные
+      if (mockDB.classes.length === 0) {
+        mockDB.classes = [
+          { id: '1', name: '5А', students: [
+            { id: '123456', password: '123456789' },
+            { id: '123457', password: '123456789' },
+            { id: '123458', password: '123456789' },
+            { id: '123459', password: '123456789' },
+            { id: '123460', password: '123456789' }
+          ]},
+          { id: '2', name: '6Б', students: [
+            { id: '226545', password: '226545789' },
+            { id: '170626', password: '170626789' },
+            { id: '930049', password: '930049789' },
+            { id: '670983', password: '670983789' }
+          ]},
+          { id: '3', name: '7В', students: [] },
+          { id: '4', name: '8А', students: [] },
+          { id: '5', name: '9Б', students: [] }
+        ];
+      }
+      
+      // Если учителей нет, создаём начальные (моковые) данные
+      if (mockDB.teachers.length === 0) {
+        mockDB.teachers = [
+          { id: '1', name: 'Учитель 1', login: 'Учитель 1', password: '123456789' },
+          { id: '2', name: 'Учитель 2', login: 'Учитель 2', password: '123456789' },
+          { id: '3', name: 'Учитель 3', login: 'Учитель 3', password: '123456789' },
+          { id: '4', name: 'Учитель 4', login: 'Учитель 4', password: '123456789' },
+          { id: '5', name: 'Учитель 5', login: 'Учитель 5', password: '123456789' }
+        ];
+      }
+      
+      saveMockData();
+    }
+
+    // Функция: сохранение данных в localStorage
+    function saveMockData() {
+      localStorage.setItem('school_admin_mock', JSON.stringify(mockDB));
+    }
+
+    // ==================== ФУНКЦИИ ОТРИСОВКИ (РЕНДЕРИНГА) ====================
+
+    // Функция: отрисовка списка классов
+    function renderClassesList() {
+      const container = document.getElementById('classes-list');
+      if (!container) return;
+      container.innerHTML = '';
+      mockDB.classes.forEach(cls => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <span class="card-title">Класс ${cls.name}</span>
+          <div class="card-actions">
+            <button class="btn" onclick="openClassInfo('${cls.name}')">Инфо</button>
+            <button class="btn" onclick="deleteClassByName('${cls.name}')">Удалить</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Функция: отрисовка списка учителей
+    function renderTeachersList() {
+      const container = document.getElementById('teachers-list');
+      if (!container) return;
+      container.innerHTML = '';
+      mockDB.teachers.forEach(teacher => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <span class="card-title">${teacher.name}</span>
+          <div class="card-actions">
+            <button class="btn" onclick="deleteTeacherById('${teacher.id}')">Удалить</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Функция: отрисовка списка учеников внутри конкретного класса
+    function renderStudentsInClass(cls) {
+      const container = document.getElementById('students-in-class');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      if (!cls.students || cls.students.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px;">Нет учеников. Добавьте первого.</div>';
+        return;
+      }
+      
+      cls.students.forEach((student) => {
+        const studentCard = document.createElement('div');
+        studentCard.className = 'student-card';
+        studentCard.innerHTML = `
+          <div class="student-info">
+            <div class="student-field"><span class="student-field-label">ID ученика:</span> ${student.id}</div>
+            <div class="student-field"><span class="student-field-label">Пароль:</span> ${student.password}</div>
+          </div>
+          <button class="delete-small-btn" onclick="deleteStudentFromClass('${cls.name}', '${student.id}')">Удалить</button>
+        `;
+        container.appendChild(studentCard);
+      });
+    }
+
+    // ==================== ФУНКЦИИ УПРАВЛЕНИЯ КЛАССАМИ ====================
+
+    // Функция: удаление класса по имени
+    window.deleteClassByName = function(className) {
+      if (confirm(`Удалить класс ${className}?`)) {
+        mockDB.classes = mockDB.classes.filter(c => c.name !== className);
+        saveMockData();
+        renderClassesList();
+      }
+    };
+
+    // Функция: открытие модального окна добавления класса
+    window.openAddClassModal = function() {
+      document.getElementById('add-class-modal').classList.add('active');
+      document.getElementById('class-name-input').value = '';
+      document.getElementById('students-count').value = '';
+    };
+
+    // Функция: подтверждение добавления нового класса
+    window.confirmAddClass = function() {
+      const className = document.getElementById('class-name-input').value.trim();
+      if (!className) {
+        alert('Введите название класса');
+        return;
+      }
+      
+      if (mockDB.classes.some(c => c.name === className)) {
+        alert('Такой класс уже существует');
+        return;
+      }
+      
+      const countInput = document.getElementById('students-count');
+      let studentsCount = parseInt(countInput.value, 10);
+      
+      if (isNaN(studentsCount) || studentsCount < 0) {
+        studentsCount = 0;
+      }
+      
+      if (studentsCount > 50) {
+        alert('Нельзя добавить более 50 учеников');
+        return;
+      }
+      
+      const newStudents = [];
+      for (let i = 0; i < studentsCount; i++) {
+        const randomId = Math.floor(Math.random() * 900000) + 100000;
+        const defaultPass = randomId.toString().slice(0, 6);
+        newStudents.push({ id: randomId.toString(), password: defaultPass + '789' });
+      }
+      
+      mockDB.classes.push({
+        id: Date.now().toString(),
+        name: className,
+        students: newStudents
+      });
+      
+      saveMockData();
+      renderClassesList();
+      closeModal('add-class-modal');
+      alert(`Класс "${className}" добавлен с ${studentsCount} учениками`);
+    };
+
+    // Функция: открытие информации о классе (модальное окно со списком учеников)
+    window.openClassInfo = function(className) {
+      const found = mockDB.classes.find(c => c.name === className);
+      if (!found) return;
+      currentClassObject = found;
+      
+      const header = document.getElementById('class-info-header');
+      if (header) header.textContent = `Класс ${found.name}`;
+      
+      renderStudentsInClass(found);
+      document.getElementById('class-info-modal').classList.add('active');
+    };
+
+    // ==================== ФУНКЦИИ УПРАВЛЕНИЯ УЧЕНИКАМИ ====================
+
+    // Функция: удаление ученика из класса
+    window.deleteStudentFromClass = function(className, studentId) {
+      const classObj = mockDB.classes.find(c => c.name === className);
+      if (classObj) {
+        classObj.students = classObj.students.filter(s => s.id !== studentId);
+        saveMockData();
+        renderStudentsInClass(classObj);
+        if (currentClassObject && currentClassObject.name === className) {
+          currentClassObject = classObj;
+        }
+      }
+    };
+
+    // Функция: открытие модального окна добавления учеников в класс
+    window.openAddStudentsBatchModal = function() {
+      if (!currentClassObject) {
+        alert('Класс не выбран');
+        return;
+      }
+      
+      const header = document.getElementById('add-students-header');
+      if (header) header.textContent = `Класс ${currentClassObject.name}`;
+      
+      document.getElementById('add-students-count').value = '';
+      document.getElementById('add-students-batch-modal').classList.add('active');
+    };
+
+    // Функция: подтверждение добавления учеников в класс
+    window.confirmAddStudentsBatch = function() {
+      if (!currentClassObject) {
+        alert('Класс не выбран');
+        closeModal('add-students-batch-modal');
+        return;
+      }
+      
+      const countInput = document.getElementById('add-students-count');
+      let studentsCount = parseInt(countInput.value, 10);
+      
+      if (isNaN(studentsCount) || studentsCount < 1) {
+        alert('Введите корректное количество учеников (от 1 до 50)');
+        return;
+      }
+      
+      if (studentsCount > 50) {
+        alert('Нельзя добавить более 50 учеников за раз');
+        return;
+      }
+      
+      const existingIds = new Set(currentClassObject.students.map(s => s.id));
+      
+      for (let i = 0; i < studentsCount; i++) {
+        let randomId;
+        do {
+          randomId = Math.floor(Math.random() * 900000) + 100000;
+        } while (existingIds.has(randomId.toString()));
+        
+        const defaultPass = randomId.toString().slice(0, 6);
+        currentClassObject.students.push({ 
+          id: randomId.toString(), 
+          password: defaultPass + '789' 
+        });
+        existingIds.add(randomId.toString());
+      }
+      
+      saveMockData();
+      renderStudentsInClass(currentClassObject);
+      closeModal('add-students-batch-modal');
+      alert(`Добавлено ${studentsCount} учеников в класс ${currentClassObject.name}`);
+    };
+
+    // Функция: скачивание списка учеников класса в текстовый файл
+    window.downloadClassList = function() {
+      if (!currentClassObject) {
+        alert('Класс не выбран');
+        return;
+      }
+      
+      const className = currentClassObject.name;
+      const students = currentClassObject.students;
+      
+      if (!students || students.length === 0) {
+        alert('В этом классе нет учеников для экспорта');
+        return;
+      }
+      
+      // Формируем содержимое файла
+      let content = `# Класс ${className}\n\n`;
+      content += `| ID ученика    | Пароль |\n`;
+      content += `|---------------|---------|\n`;
+      
+      students.forEach(student => {
+        content += `| ${student.id.padEnd(13)} | ${student.password} |\n`;
+      });
+      
+      content += `\n\n`;
+      content += `Всего учеников: ${students.length}\n`;
+      content += `Дата выгрузки: ${new Date().toLocaleString()}\n`;
+      
+      // Создаём и скачиваем файл
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = `class_${className}_students.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert(`Файл "class_${className}_students.txt" успешно скачан`);
+    };
+
+    // ==================== ФУНКЦИИ УПРАВЛЕНИЯ УЧИТЕЛЯМИ ====================
+
+    // Функция: удаление учителя по ID
+    window.deleteTeacherById = function(id) {
+      const teacher = mockDB.teachers.find(t => t.id === id);
+      if (teacher && confirm(`Удалить ${teacher.name}?`)) {
+        mockDB.teachers = mockDB.teachers.filter(t => t.id !== id);
+        saveMockData();
+        renderTeachersList();
+      }
+    };
+
+    // Функция: открытие модального окна добавления учителя
+    window.openAddTeacherModal = function() {
+      const generated = generateTeacherCredentials();
+      document.getElementById('teacher-login').value = generated.login;
+      document.getElementById('teacher-password').value = generated.password;
+      document.getElementById('add-teacher-modal').classList.add('active');
+    };
+
+    // Функция: подтверждение добавления нового учителя
+    window.confirmAddTeacher = function() {
+      const login = document.getElementById('teacher-login').value.trim();
+      const password = document.getElementById('teacher-password').value.trim();
+      
+      if (!login) {
+        alert('Введите логин учителя');
+        return;
+      }
+      
+      if (!password) {
+        alert('Введите пароль');
+        return;
+      }
+      
+      if (mockDB.teachers.some(t => t.login === login)) {
+        alert('Учитель с таким логином уже существует');
+        return;
+      }
+      
+      const newTeacher = {
+        id: Date.now().toString(),
+        name: login,
+        login: login,
+        password: password
+      };
+      
+      mockDB.teachers.push(newTeacher);
+      saveMockData();
+      renderTeachersList();
+      closeModal('add-teacher-modal');
+      alert(`Учитель "${login}" добавлен\nПароль: ${password}`);
+    };
+
+    // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+
+    // Функция: закрытие модального окна по ID
+    window.closeModal = function(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+      if (modalId === 'class-info-modal') {
+        currentClassObject = null;
+      }
+    };
+
+    // Функция: инициализация переключения вкладок (Ученики / Учителя)
+    function initTabs() {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panels = document.querySelectorAll('.tab-panel');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetTab = tab.getAttribute('data-tab');
+          if (!targetTab) return;
+          
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          panels.forEach(panel => panel.classList.remove('active'));
+          if (targetTab === 'students') {
+            document.getElementById('students').classList.add('active');
+            renderClassesList();
+          } else if (targetTab === 'teachers') {
+            document.getElementById('teachers').classList.add('active');
+            renderTeachersList();
+          }
+        });
+      });
+    }
+
+    // ==================== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ====================
+
+    // Функция: полная инициализация приложения
+    function init() {
+      loadMockData();
+      renderClassesList();
+      renderTeachersList();
+      initTabs();
+    }
+
+    // Запуск инициализации после загрузки DOM
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

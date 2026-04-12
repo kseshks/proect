@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Диалог | Vie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="student_dialog_style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- ШАПКА -->
+    <div class="header">
+      <div class="header-box">
+        <span class="header-title">Обучающая диалоговая система</span>
+      </div>
+    </div>
+
+    <!-- ОБЛАСТЬ ДИАЛОГА -->
+    <div class="dialog-area" id="dialog-area">
+      <div class="messages-container" id="messages-container">
+        <!-- Заголовок с темой -->
+        <div class="topic-header" id="topic-header"></div>
+        
+        <!-- Сообщения будут добавляться динамически -->
+      </div>
+    </div>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ ВВОДА -->
+    <div class="input-panel">
+      <div class="input-container">
+        <input 
+          type="text" 
+          class="question-input" 
+          id="question-input" 
+          placeholder="Задайте вопрос нейрорепетитору"
+          autocomplete="off"
+        >
+        <button class="send-btn" id="send-btn">Задать</button>
+      </div>
+    </div>
+
+    <!-- КНОПКА "НАЗАД" -->
+    <button class="back-btn" onclick="goBack()">← Назад</button>
+  </div>
+
+  <script>
+    // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И КОНСТАНТЫ ====================
+    
+    // Получаем ID и название выбранной темы из localStorage
+    const TOPIC_ID = localStorage.getItem('selected_topic_id') || '1';
+    const TOPIC_TITLE = localStorage.getItem('selected_topic_title') || 'Основы квантовой физики';
+
+    // Мок-база данных вопросов по темам
+    const MOCK_QUESTIONS_DB = {
+      1: [
+        { id: 101, text: "Расскажи о Наполеоне Бонапарте", sort_order: 1 },
+        { id: 102, text: "Объясни причины Великой французской революции", sort_order: 2 },
+        { id: 103, text: "Какие реформы провёл Наполеон?", sort_order: 3 }
+      ],
+      2: [
+        { id: 201, text: "Расскажи о корпускулярно-волновом дуализме", sort_order: 1 },
+        { id: 202, text: "Объясни принцип неопределённости Гейзенберга", sort_order: 2 },
+        { id: 203, text: "Что такое уравнение Шрёдингера?", sort_order: 3 }
+      ],
+      3: [
+        { id: 301, text: "Расскажи о Present Perfect", sort_order: 1 },
+        { id: 302, text: "Объясни разницу между Past Simple и Present Perfect", sort_order: 2 },
+        { id: 303, text: "Когда используется Future Continuous?", sort_order: 3 }
+      ],
+      4: [
+        { id: 401, text: "Расскажи о алканах", sort_order: 1 },
+        { id: 402, text: "Объясни реакции замещения", sort_order: 2 },
+        { id: 403, text: "Что такое ароматические соединения?", sort_order: 3 }
+      ],
+      5: [
+        { id: 501, text: "Расскажи о символизме", sort_order: 1 },
+        { id: 502, text: "Объясни особенности творчества А. Блока", sort_order: 2 },
+        { id: 503, text: "Кто такие акмеисты?", sort_order: 3 }
+      ]
+    };
+
+    // Мок-база ответов нейросети
+    const MOCK_ANSWERS_DB = {
+      101: "Наполеон Бонапарт (1769-1821) — французский полководец и государственный деятель, император французов в 1804-1814 и 1815 годах. Он провёл ряд успешных военных кампаний, создал Кодекс Наполеона, реформировал систему образования и административное деление Франции. Его правление ознаменовало конец Французской революции и начало Наполеоновских войн, изменивших карту Европы.",
+      102: "Великая французская революция (1789-1799) была вызвана комплексом причин: финансовый кризис из-за долгов монархии, неурожаи и голод 1788-1789 годов, недовольство третьего сословия привилегиями дворянства и духовенства, распространение идей Просвещения о свободе и равенстве, а также слабость короля Людовика XVI как правителя.",
+      103: "Наполеон провёл масштабные реформы: создал Гражданский кодекс (Кодекс Наполеона), закрепивший равенство перед законом и защиту частной собственности; реформировал административную систему, создав префектуры; основал Банк Франции; ввёл систему средних школ (лицеев); заключил Конкордат с Папой Римским, урегулировав отношения с церковью.",
+      201: "Корпускулярно-волновой дуализм — фундаментальный принцип квантовой механики, согласно которому все микрообъекты (электроны, фотоны и др.) проявляют одновременно свойства как частиц (корпускул), так и волн. Например, свет может вести себя как поток частиц (фотоэффект) и как волна (интерференция, дифракция). Эта двойственность описывается соотношением де Бройля: λ = h/p.",
+      202: "Принцип неопределённости Гейзенберга утверждает, что невозможно одновременно точно измерить координату и импульс частицы. Математически: Δx · Δp ≥ ħ/2. Чем точнее мы знаем положение частицы, тем менее определён её импульс, и наоборот. Это не недостаток приборов, а фундаментальное свойство квантового мира.",
+      301: "Present Perfect (настоящее совершённое время) образуется: have/has + V3 (причастие прошедшего времени). Используется для: 1) действий, завершившихся к настоящему моменту, но связанных с ним (I have lost my keys); 2) жизненного опыта (She has visited Paris); 3) действий, начавшихся в прошлом и продолжающихся (We have lived here since 2010).",
+      401: "Алканы (предельные углеводороды, парафины) — это углеводороды с общей формулой CnH2n+2, содержащие только одинарные связи C-C и C-H. Примеры: метан CH₄, этан C₂H₆, пропан C₃H₈. Для алканов характерны реакции замещения (галогенирование, нитрование), горение, крекинг. Они химически малоактивны, поэтому называются парафинами (от лат. parum affinis — мало сродства).",
+      501: "Символизм — литературно-художественное направление конца XIX — начала XX века, возникшее во Франции (Бодлер, Верлен, Рембо) и получившее развитие в России. Символисты считали искусство интуитивным постижением мирового единства через символы. Основные черты: мистицизм, музыкальность стиха, намёк вместо прямого высказывания, культ Вечной Женственности. Русские символисты: Блок, Брюсов, Бальмонт, Белый.",
+      default: "Это интересный вопрос! На основе материалов темы могу сказать, что данная тема требует более детального изучения. Рекомендую обратиться к учебным материалам раздела или задать более конкретный вопрос, связанный с ключевыми понятиями темы."
+    };
+
+    // История диалога (массив сообщений)
+    let dialogHistory = [];
+
+    // DOM-элементы
+    const messagesContainer = document.getElementById('messages-container');
+    const questionInput = document.getElementById('question-input');
+    const sendBtn = document.getElementById('send-btn');
+    const topicHeader = document.getElementById('topic-header');
+    const dialogArea = document.getElementById('dialog-area');
+
+    // ==================== ФУНКЦИИ ДЛЯ РАБОТЫ С API ====================
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: fetchTopicDetail
+     * Имитация GET-запроса к /student/topics/{topic_id}
+     * Возвращает детальную информацию о теме, включая список вопросов
+     * @param {string|number} topicId - ID темы
+     * @returns {Promise<Object>} Объект с данными темы
+     */
+    async function fetchTopicDetail(topicId) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      const questions = MOCK_QUESTIONS_DB[topicId] || MOCK_QUESTIONS_DB[1];
+      return { 
+        id: parseInt(topicId), 
+        title: TOPIC_TITLE, 
+        description: "Описание темы", 
+        materials: "Материалы для изучения", 
+        questions: questions 
+      };
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: askQuestion
+     * Имитация POST-запроса к /student/topics/{topic_id}/ask
+     * Отправляет вопрос и получает ответ от "нейросети"
+     * @param {string|number} topicId - ID темы
+     * @param {number|null} questionId - ID вопроса из БД (null для кастомных)
+     * @param {string|null} customQuestion - Текст кастомного вопроса
+     * @returns {Promise<Object>} Объект с вопросом и ответом
+     */
+    async function askQuestion(topicId, questionId, customQuestion = null) {
+      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+      let answer, questionText;
+      
+      if (customQuestion) {
+        // Пользователь ввёл свой вопрос
+        questionText = customQuestion;
+        answer = `По вашему вопросу "${customQuestion}" могу отметить, что это интересный аспект темы. Рекомендую изучить основные понятия раздела, чтобы лучше понять контекст. ${MOCK_ANSWERS_DB.default}`;
+      } else {
+        // Выбран вопрос из списка
+        const questions = MOCK_QUESTIONS_DB[topicId] || MOCK_QUESTIONS_DB[1];
+        const question = questions.find(q => q.id === questionId);
+        questionText = question ? question.text : "Вопрос";
+        answer = MOCK_ANSWERS_DB[questionId] || MOCK_ANSWERS_DB.default;
+      }
+      
+      const newMessage = { 
+        id: Date.now(), 
+        question_id: questionId || null, 
+        question_text: questionText, 
+        answer_text: answer 
+      };
+      dialogHistory.push(newMessage);
+      return newMessage;
+    }
+
+    // ==================== ФУНКЦИИ ОТРИСОВКИ ИНТЕРФЕЙСА ====================
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: renderInitialState
+     * Отрисовка начального состояния страницы
+     * Показывает приветствие и вопросы-подсказки
+     */
+    async function renderInitialState() {
+      topicHeader.textContent = `Тема: ${TOPIC_TITLE}`;
+      const topicDetail = await fetchTopicDetail(TOPIC_ID);
+      
+      // Очищаем контейнер (кроме заголовка темы)
+      const children = Array.from(messagesContainer.children);
+      children.forEach(child => { 
+        if (!child.classList.contains('topic-header')) child.remove(); 
+      });
+      
+      // Добавляем приветственное сообщение
+      const welcomeMsg = document.createElement('div');
+      welcomeMsg.className = 'message-bot';
+      welcomeMsg.textContent = `Добро пожаловать в тему "${TOPIC_TITLE}"! Задайте вопрос нейрорепетитору или выберите один из предложенных ниже.`;
+      messagesContainer.appendChild(welcomeMsg);
+      
+      // Добавляем разделитель
+      const divider = document.createElement('div');
+      divider.className = 'divider';
+      messagesContainer.appendChild(divider);
+      
+      // Добавляем вопросы-подсказки
+      if (topicDetail.questions && topicDetail.questions.length > 0) {
+        const suggestionsWrapper = document.createElement('div');
+        suggestionsWrapper.className = 'suggestions-wrapper';
+        
+        const questionsToShow = topicDetail.questions.slice(0, 2);
+        questionsToShow.forEach(q => {
+          const suggestion = document.createElement('div');
+          suggestion.className = 'suggestion-item';
+          suggestion.textContent = q.text;
+          suggestion.dataset.questionId = q.id;
+          suggestion.dataset.questionText = q.text;
+          suggestion.addEventListener('click', () => handleSuggestionClick(q.id, q.text));
+          suggestionsWrapper.appendChild(suggestion);
+        });
+        
+        messagesContainer.appendChild(suggestionsWrapper);
+      }
+      
+      dialogArea.scrollTop = dialogArea.scrollHeight;
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: handleSuggestionClick
+     * Обработчик клика по вопросу-подсказке
+     * @param {number} questionId - ID выбранного вопроса
+     * @param {string} questionText - Текст вопроса
+     */
+    async function handleSuggestionClick(questionId, questionText) {
+      addUserMessage(questionText);
+      sendBtn.disabled = true;
+      questionInput.disabled = true;
+      showLoadingIndicator();
+      
+      try {
+        const response = await askQuestion(TOPIC_ID, questionId);
+        removeLoadingIndicator();
+        addBotMessage(response.answer_text);
+      } catch (error) {
+        console.error('Ошибка:', error);
+        removeLoadingIndicator();
+        addBotMessage('Извините, произошла ошибка. Попробуйте ещё раз.');
+      } finally {
+        sendBtn.disabled = false;
+        questionInput.disabled = false;
+        questionInput.focus();
+      }
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: addUserMessage
+     * Добавляет сообщение пользователя в диалог
+     * @param {string} text - Текст сообщения
+     */
+    function addUserMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message-user';
+      msgDiv.textContent = text;
+      messagesContainer.appendChild(msgDiv);
+      
+      const divider = document.createElement('div');
+      divider.className = 'divider';
+      messagesContainer.appendChild(divider);
+      
+      dialogArea.scrollTop = dialogArea.scrollHeight;
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: addBotMessage
+     * Добавляет сообщение бота в диалог
+     * @param {string} text - Текст сообщения
+     */
+    function addBotMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message-bot';
+      msgDiv.textContent = text;
+      messagesContainer.appendChild(msgDiv);
+      
+      const divider = document.createElement('div');
+      divider.className = 'divider';
+      messagesContainer.appendChild(divider);
+      
+      dialogArea.scrollTop = dialogArea.scrollHeight;
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: showLoadingIndicator
+     * Показывает индикатор загрузки (нейросеть "печатает")
+     */
+    function showLoadingIndicator() {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'message-bot';
+      loadingDiv.id = 'loading-indicator';
+      loadingDiv.innerHTML = 'Печатает<span class="loading"></span>';
+      messagesContainer.appendChild(loadingDiv);
+      dialogArea.scrollTop = dialogArea.scrollHeight;
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: removeLoadingIndicator
+     * Удаляет индикатор загрузки
+     */
+    function removeLoadingIndicator() {
+      const indicator = document.getElementById('loading-indicator');
+      if (indicator) indicator.remove();
+    }
+
+    /**
+     * НАЧАЛО ФУНКЦИИ: handleSendQuestion
+     * Обработчик отправки кастомного вопроса из поля ввода
+     */
+    async function handleSendQuestion() {
+      const question = questionInput.value.trim();
+      if (!question) return;
+      
+      addUserMessage(question);
+      questionInput.value = '';
+      sendBtn.disabled = true;
+      questionInput.disabled = true;
+      showLoadingIndicator();
+      
+      try {
+        const response = await askQuestion(TOPIC_ID, null, question);
+        removeLoadingIndicator();
+        addBotMessage(response.answer_text);
+      } catch (error) {
+        console.error('Ошибка:', error);
+        removeLoadingIndicator();
+        addBotMessage('Извините, произошла ошибка. Попробуйте ещё раз.');
+      } finally {
+        sendBtn.disabled = false;
+        questionInput.disabled = false;
+        questionInput.focus();
+      }
+    }
+
+    window.goBack = function() {
+      window.location.href = 'student_themes.html';
+    };
+
+    // Обработчик кнопки "Задать"
+    sendBtn.addEventListener('click', handleSendQuestion);
+    
+    // Обработчик нажатия Enter в поле ввода
+    questionInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !sendBtn.disabled) handleSendQuestion();
+    });
+
+    // ==================== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderInitialState();
+      
+      function adjustScale() {
+        const container = document.querySelector('.app-container');
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        
+        if (windowWidth < 1440 || windowHeight < 1024) {
+          const scaleX = windowWidth / 1440;
+          const scaleY = windowHeight / 1024;
+          const scale = Math.min(scaleX, scaleY);
+          
+          container.style.transform = `scale(${scale})`;
+          container.style.width = `${1440}px`;
+          container.style.height = `${1024}px`;
+        } else {
+          container.style.transform = 'none';
+          container.style.width = '100%';
+          container.style.height = '100vh';
+        }
+      }
+      
+      adjustScale();
+      window.addEventListener('resize', adjustScale);
+    });
+  </script>
+</body>
+</html>

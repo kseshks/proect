@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Темы | Vie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="student_themes_style.css">
+</head>
+<body>
+
+  <!-- КОНТЕЙНЕР СО СПИСКОМ ТЕМ -->
+  <div class="themes-container">
+    <div class="themes-wrapper" id="themes-list">
+      <!-- Темы будут динамически вставлены через JavaScript -->
+    </div>
+  </div>
+
+  <!-- КНОПКА "НАЧАТЬ" -->
+  <button class="start-btn" id="start-btn" disabled>Начать</button>
+
+  <!-- СООБЩЕНИЕ О СТАТУСЕ -->
+  <div class="status-message" id="status-message"></div>
+
+  <!-- ПОДПИСЬ -->
+  <div class="footer">Made by Vie</div>
+
+  <script>
+    // ==================== MOCK-ЗАГЛУШКИ ДЛЯ БЭКЕНДА ====================
+    
+    // Мок-база данных тем (имитация ответа от /student/topics)
+    const MOCK_TOPICS_DB = [
+      {
+        id: 1,
+        title: "История Франции XVIII-XIX веков",
+        description: "Великая французская революция, Наполеоновские войны, Реставрация Бурбонов",
+        questions_count: 8
+      },
+      {
+        id: 2,
+        title: "Основы квантовой физики",
+        description: "Корпускулярно-волновой дуализм, уравнение Шрёдингера, принцип неопределённости",
+        questions_count: 12
+      },
+      {
+        id: 3,
+        title: "Английская грамматика: времена",
+        description: "Present Simple, Present Continuous, Present Perfect, Past Simple, Future forms",
+        questions_count: 15
+      },
+      {
+        id: 4,
+        title: "Органическая химия: углеводороды",
+        description: "Алканы, алкены, алкины, ароматические соединения, реакции замещения и присоединения",
+        questions_count: 10
+      },
+      {
+        id: 5,
+        title: "Литература Серебряного века",
+        description: "Символизм, акмеизм, футуризм. Творчество Блока, Ахматовой, Маяковского",
+        questions_count: 7
+      }
+    ];
+
+    // Текущий выбранный ID темы
+    let selectedTopicId = null;
+
+    // DOM-элементы
+    const themesListEl = document.getElementById('themes-list');
+    const startBtn = document.getElementById('start-btn');
+    const statusMessageEl = document.getElementById('status-message');
+
+    // ==================== ФУНКЦИИ ДЛЯ РАБОТЫ С "API" ====================
+
+    /**
+     * Имитация GET-запроса к /student/topics
+     * Возвращает список тем, назначенных текущему студенту
+     */
+    async function fetchStudentTopics() {
+      // Имитация сетевой задержки
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // В реальном приложении здесь был бы fetch к /student/topics
+      // const response = await fetch('/student/topics', {
+      //   headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+      // });
+      // const data = await response.json();
+      // return data;
+      
+      return MOCK_TOPICS_DB;
+    }
+
+    // ==================== ФУНКЦИИ ОТРИСОВКИ ====================
+
+    /**
+     * Отрисовка списка тем
+     */
+    function renderThemes(topics) {
+      if (!topics || topics.length === 0) {
+        themesListEl.innerHTML = `
+          <div class="empty-state">
+            <p>Нет назначенных тем</p>
+            <p style="font-size: 14px; margin-top: 10px;">Обратитесь к учителю для назначения тем</p>
+          </div>
+        `;
+        startBtn.disabled = true;
+        return;
+      }
+
+      let html = '';
+      topics.forEach(topic => {
+        html += `
+          <div class="theme-card" data-topic-id="${topic.id}">
+            <span class="theme-title">${topic.title}</span>
+            <button class="select-btn" data-topic-id="${topic.id}" onclick="selectTopic(${topic.id})">
+              Выбрать
+            </button>
+          </div>
+        `;
+      });
+      
+      themesListEl.innerHTML = html;
+      
+      // Сбрасываем выбранную тему
+      selectedTopicId = null;
+      startBtn.disabled = true;
+      
+      // Убираем класс selected со всех кнопок
+      document.querySelectorAll('.select-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        btn.textContent = 'Выбрать';
+      });
+    }
+
+    /**
+     * Выбор темы
+     */
+    window.selectTopic = function(topicId) {
+      // Убираем выделение со всех кнопок
+      document.querySelectorAll('.select-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        btn.textContent = 'Выбрать';
+      });
+      
+      // Находим кнопку, соответствующую выбранной теме
+      const selectedBtn = document.querySelector(`.select-btn[data-topic-id="${topicId}"]`);
+      if (selectedBtn) {
+        selectedBtn.classList.add('selected');
+        selectedBtn.textContent = 'Выбрано';
+      }
+      
+      // Сохраняем ID выбранной темы
+      selectedTopicId = topicId;
+      
+      // Активируем кнопку "Начать"
+      startBtn.disabled = false;
+      
+      // Очищаем сообщение о статусе
+      statusMessageEl.textContent = '';
+    };
+
+    /**
+     * Обработчик нажатия кнопки "Начать"
+     */
+    window.startLearning = function() {
+      if (!selectedTopicId) {
+        statusMessageEl.textContent = 'Пожалуйста, выберите тему';
+        return;
+      }
+      
+      // Находим выбранную тему для отображения названия (опционально)
+      const selectedTopic = MOCK_TOPICS_DB.find(t => t.id === selectedTopicId);
+      
+      // Сохраняем выбранную тему в localStorage для использования на странице диалога
+      localStorage.setItem('selected_topic_id', selectedTopicId);
+      if (selectedTopic) {
+        localStorage.setItem('selected_topic_title', selectedTopic.title);
+      }
+      
+      // Переходим на страницу диалога
+      window.location.href = 'student_dialog.html';
+    };
+
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+    /**
+     * Загрузка тем при открытии страницы
+     */
+    async function loadTopics() {
+      try {
+        statusMessageEl.textContent = 'Загрузка тем...';
+        
+        const topics = await fetchStudentTopics();
+        renderThemes(topics);
+        
+        statusMessageEl.textContent = '';
+      } catch (error) {
+        console.error('Ошибка загрузки тем:', error);
+        statusMessageEl.textContent = 'Ошибка при загрузке тем. Попробуйте обновить страницу.';
+        themesListEl.innerHTML = `
+          <div class="empty-state">
+            <p>Ошибка загрузки</p>
+            <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; cursor: pointer;">Повторить</button>
+          </div>
+        `;
+      }
+    }
+
+    // Привязываем обработчик к кнопке "Начать"
+    startBtn.addEventListener('click', startLearning);
+
+    // Загружаем темы при загрузке страницы
+    document.addEventListener('DOMContentLoaded', loadTopics);
+  </script>
+</body>
+</html>

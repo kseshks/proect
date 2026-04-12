@@ -1,0 +1,360 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    position: relative;
+    min-width: 1000px;
+    height: 100vh;
+    background: #A7AADB;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+/* Основной контейнер — масштабируется относительно экрана */
+.app-container {
+    position: relative;
+    width: 100%;
+    max-width: 1440px;
+    height: 100vh;
+    margin: 0 auto;
+    transform-origin: top left;
+}
+
+/* Шапка с названием */
+.header {
+    position: absolute;
+    width: 80.76%; /* 1163/1440 */
+    height: 71px;
+    left: 9.65%; /* 139/1440 */
+    top: 2.64%; /* 27/1024 */
+    background: #A7AADB;
+}
+
+.header-box {
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 70px;
+    left: 0;
+    top: 1px;
+    background: #FFFFFF;
+    border: 1px solid #13164B;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 25px;
+    line-height: 30px;
+    color: #13164B;
+}
+
+/* Область диалога */
+.dialog-area {
+    position: absolute;
+    width: 80.76%; /* 1163/1440 */
+    height: calc(100vh - 444px); /* Адаптивная высота: 1024 - 120 - 234 - 70 */
+    min-height: 400px;
+    max-height: 580px;
+    left: 9.65%; /* 139/1440 */
+    top: 120px;
+    overflow-y: auto;
+    padding: 0 20px;
+}
+
+.dialog-area::-webkit-scrollbar {
+    width: 12px;
+}
+
+.dialog-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dialog-area::-webkit-scrollbar-thumb {
+    background: #FFFFFF;
+    border: 2px solid #13164B;
+    border-radius: 30px;
+}
+
+/* Контейнер для сообщений */
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+/* Сообщение от бота (слева) */
+.message-bot {
+    box-sizing: border-box;
+    max-width: 517px;
+    padding: 20px 25px;
+    background: #DDE8FB;
+    border: 2px solid #13164B;
+    border-radius: 30px 30px 30px 0;
+    margin-left: 0;
+    margin-right: auto;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #13164B;
+    word-wrap: break-word;
+}
+
+/* Сообщение от пользователя (справа) */
+.message-user {
+    box-sizing: border-box;
+    max-width: 469px;
+    padding: 20px 25px;
+    background: #FFFFFF;
+    border: 2px solid #13164B;
+    border-radius: 30px;
+    margin-left: auto;
+    margin-right: 0;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #13164B;
+    word-wrap: break-word;
+}
+
+/* Блок с вопросами-подсказками */
+.suggestions-wrapper {
+    margin-left: 0;
+    margin-right: auto;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.suggestion-item {
+    box-sizing: border-box;
+    width: 409px;
+    max-width: 100%;
+    padding: 15px 20px;
+    background: #DDE8FB;
+    border: 2px solid #13164B;
+    border-radius: 0 30px 30px 30px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    color: #13164B;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.suggestion-item:hover {
+    background: #c8d8f5;
+    transform: translateX(5px);
+}
+
+/* Заголовок "Тема:" */
+.topic-header {
+    margin-left: 0;
+    margin-right: auto;
+    margin-bottom: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #13164B;
+    opacity: 0.8;
+    padding-left: 10px;
+}
+
+/* Нижняя панель ввода */
+.input-panel {
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 234px;
+    left: 0;
+    bottom: 70px; /* Оставляем место для кнопки Назад */
+    border-top: 5px solid #13164B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-container {
+    box-sizing: border-box;
+    width: 68.89%; /* 992/1440 */
+    max-width: 992px;
+    height: 118px;
+    background: #FFFFFF;
+    border: 3px solid #13164B;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    padding: 0 35px;
+}
+
+.question-input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 24px;
+    color: #13164B;
+    background: transparent;
+}
+
+.question-input::placeholder {
+    color: #13164B;
+    opacity: 0.6;
+}
+
+.send-btn {
+    box-sizing: border-box;
+    min-width: 120px;
+    height: 46px;
+    background: #DDE8FB;
+    border: 2px solid #13164B;
+    border-radius: 30px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #13164B;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 20px;
+    padding: 0 20px;
+}
+
+.send-btn:hover {
+    background: #c8d8f5;
+}
+
+.send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Кнопка "Назад" */
+.back-btn {
+    box-sizing: border-box;
+    position: absolute;
+    width: 273px;
+    height: 57px;
+    right: 20px;
+    bottom: 10px;
+    background: #FFFFFF;
+    border: 4px solid #13164B;
+    border-radius: 30px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: #13164B;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.back-btn:hover {
+    background: #f0f4ff;
+}
+
+/* Подпись "Made by Vie" */
+.footer {
+    position: absolute;
+    right: 20px;
+    bottom: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #13164B;
+}
+
+/* Индикатор загрузки */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #13164B;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Разделитель между сообщениями */
+.divider {
+    width: 100%;
+    height: 1px;
+    background: transparent;
+    margin: 10px 0;
+}
+
+/* Адаптация для маленьких экранов */
+@media (max-width: 1200px) {
+    .header-title {
+    font-size: 22px;
+    }
+    
+    .message-bot, .message-user {
+    font-size: 18px;
+    padding: 15px 20px;
+    }
+    
+    .suggestion-item {
+    font-size: 18px;
+    padding: 12px 18px;
+    }
+}
+
+@media (max-height: 900px) {
+    .dialog-area {
+    height: 400px;
+    }
+    
+    .input-panel {
+    height: 200px;
+    }
+    
+    .input-container {
+    height: 100px;
+    }
+}
+
+/* Гарантируем видимость кнопки Назад */
+@media (max-height: 800px) {
+    .back-btn {
+    bottom: 5px;
+    }
+}

@@ -3,24 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Образовательная платформа</title>
-    <link rel="stylesheet" href="app/static/css/main.css">
-    <link rel="stylesheet" href="app/static/css/components/buttons.css">
-    <link rel="stylesheet" href="app/static/css/components/cards.css">
+    <title>Vie Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            position: relative;
+            width: 1440px;
+            height: 1024px;
+            background: #A7AADB;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .logo-wrapper {
+            box-sizing: border-box;
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            left: 669px;
+            top: 254px;
+            background: #FFFFFF;
+            border: 3px solid #797FE0;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-svg {
+            position: relative;
+            width: 61px;
+            height: 52px;
+        }
+
+        .logo-svg path {
+            stroke: #13164B;
+            stroke-width: 2px;
+        }
+
+        .login-card {
+            box-sizing: border-box;
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            left: 520px;
+            top: 378px;
+            background: #FFFFFF;
+            border: 5px solid #797FE0;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 42px;
+        }
+
+        .btn {
+            box-sizing: border-box;
+            width: 333px;
+            height: 60px;
+            background: #A7AADB;
+            border: 1px solid #13164B;
+            border-radius: 30px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            color: #13164B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.2s ease;
+        }
+
+        .btn:nth-of-type(1) {
+            margin-top: 0;
+        }
+
+        .btn:nth-of-type(2) {
+            margin-top: 50px;
+        }
+
+        .btn:nth-of-type(3) {
+            margin-top: 50px;
+        }
+
+        .btn:hover {
+            background: #979bc9;
+            border-color: #0f1240;
+        }
+
+        .btn:active {
+            background: #868bc2;
+        }
+
+        .footer {
+            position: absolute;
+            width: 255px;
+            height: 56px;
+            left: 145px;
+            bottom: 0;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #071B40;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="role-selection">
-            <h1 class="title">Образовательная платформа</h1>
-            <div class="role-buttons">
-                <button class="role-btn admin-btn" onclick="window.location.href='app/static/pages/admin_login.html'">Войти как администратор</button>
-                <button class="role-btn teacher-btn" onclick="window.location.href='app/static/pages/teacher_login.html'">Войти как учитель</button>
-                <button class="role-btn student-btn" onclick="window.location.href='app/static/pages/student_login.html'">Войти как ученик</button>
-            </div>
-            <div class="footer">
-                <p>Made by Vie</p>
-            </div>
-        </div>
+
+    <div class="logo-wrapper">
+        <svg class="logo-svg" width="61" height="56" viewBox="0 0 61 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.15517 1H0M3.15517 1H6.66092M3.15517 1L9.6408 14L16.1264 27L22.6121 40M57.4943 1H61M57.4943 1H53.9885M57.4943 1L50.3951 14L43.296 27L36.1968 40M22.6121 40L29.0977 53L36.1968 40M22.6121 40L22 1M22.6121 40H28M22.6121 40H17M22 1H28M22 1H17M36.1968 40H42M36.1968 40H33V20.5M42 1H33V20.5M33 20.5H42" stroke="#13164B" stroke-width="2"/>
+        </svg>
     </div>
+
+    <div class="login-card">
+        <button class="btn" onclick="location.href='app/static/teacher/login_teacher.html'">Войти как учитель</button>
+        <button class="btn" onclick="location.href='app/static/student/login_student.html'">Войти как ученик</button>
+        <button class="btn" onclick="location.href='app/static/admin/login_admin.html'">Войти как администратор</button>
+        <div class="footer">Made by Vie</div>
+    </div>
+
 </body>
 </html>

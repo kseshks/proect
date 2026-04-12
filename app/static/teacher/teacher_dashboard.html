@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель учителя | Vie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="teacher_dashboard_style.css">
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <button class="tab-btn active" data-tab="students">Ученики</button>
+    <button class="tab-btn" data-tab="rating">Рейтинг</button>
+    <button class="tab-btn" data-tab="topics">Темы и тесты</button>
+  </aside>
+
+  <main class="main-content">
+    
+    <!-- ВКЛАДКА "УЧЕНИКИ" (КЛАССЫ) -->
+    <div class="tab-panel active" id="students">
+      <div class="list-container">
+        <div class="scrollbar-visual"></div>
+        <div class="cards-wrapper" id="classes-list"></div>
+      </div>
+      <button class="add-btn" onclick="openAddClassModal()">Добавить класс</button>
+    </div>
+
+    <!-- ВКЛАДКА "РЕЙТИНГ" -->
+    <div class="tab-panel" id="rating">
+      <div id="rating-classes-view">
+        <div class="list-container">
+          <div class="scrollbar-visual"></div>
+          <div class="cards-wrapper" id="rating-classes-list"></div>
+        </div>
+        <button class="add-btn overall-rating-btn" onclick="showOverallRating()">Посмотреть общий рейтинг</button>
+      </div>
+      
+      <div id="rating-table-view" style="display: none; width: 100%;">
+        <div class="rating-header">
+          <span class="rating-title" id="rating-view-title">Общий рейтинг</span>
+          <button class="btn back-from-rating-btn" onclick="backToRatingClasses()">← Назад к классам</button>
+        </div>
+        <div class="list-container" style="padding: 20px;">
+          <div class="rating-table-container">
+            <table class="rating-table" id="rating-table"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА "ТЕМЫ И ТЕСТЫ" -->
+    <div class="tab-panel" id="topics">
+      <div class="list-container">
+        <div class="scrollbar-visual"></div>
+        <div class="cards-wrapper" id="topics-assign-list"></div>
+      </div>
+      
+      <button class="assign-topic-btn hidden" id="assign-topic-btn" onclick="openAssignedTopicsModal()">Назначить</button>
+    </div>
+
+    <div class="footer">Made by Vie</div>
+  </main>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: ИНФО О КЛАССЕ -->
+<div class="modal-overlay" id="class-info-modal">
+  <div class="modal-content">
+    <div class="class-header" id="class-info-header">Класс</div>
+    <div class="students-list-container">
+      <div class="scrollbar-visual"></div>
+      <div class="students-cards-wrapper" id="students-in-class"></div>
+    </div>
+    <button class="add-btn" onclick="openAddStudentsModal()">Добавить ученика</button>
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="closeModal('class-info-modal')">Назад</button>
+      <button class="nav-btn" onclick="downloadClassList()">Скачать</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: ДОБАВЛЕНИЕ КЛАССА -->
+<div class="modal-overlay" id="add-class-modal">
+  <div class="modal-content">
+    <div class="class-header">Класс</div>
+    <div class="form-row">
+      <input type="text" class="form-input" placeholder="Название класса" id="class-name-input">
+    </div>
+    <div class="form-row">
+      <input type="number" class="form-input" placeholder="Количество учеников" id="students-count" min="1" max="50">
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="closeModal('add-class-modal')">Назад</button>
+      <button class="nav-btn" onclick="confirmAddClass()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: ДОБАВЛЕНИЕ УЧЕНИКОВ -->
+<div class="modal-overlay" id="add-students-modal">
+  <div class="modal-content">
+    <div class="class-header" id="add-students-header">Класс</div>
+    <div class="form-row">
+      <input type="number" class="form-input" placeholder="Количество учеников" id="add-students-count" min="1" max="50">
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="closeModal('add-students-modal')">Назад</button>
+      <button class="nav-btn" onclick="confirmAddStudents()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: СПИСОК НАЗНАЧЕННЫХ ТЕМ -->
+<div class="modal-overlay" id="assigned-topics-modal">
+  <div class="modal-content" style="max-width: 900px;">
+    <div class="class-header" id="assigned-topics-header">Назначенные темы</div>
+    
+    <div class="assigned-topics-list" id="assigned-topics-list"></div>
+    
+    <button class="add-btn" style="width: 100%; max-width: 500px;" onclick="openCreateTopicModal()">Загрузить тему</button>
+    
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="closeModal('assigned-topics-modal')">Назад</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: СОЗДАНИЕ НОВОЙ ТЕМЫ -->
+<div class="modal-overlay" id="create-topic-modal">
+  <div class="modal-content" style="max-width: 800px;">
+    <div class="class-header">Новая тема</div>
+    
+    <div class="form-row">
+      <input type="text" class="form-input" placeholder="Введите название темы" id="new-topic-title">
+    </div>
+    
+    <div class="file-link-section">
+      <div class="section-label">Добавьте файлы</div>
+      <div id="files-container">
+        <div class="file-item">
+          <input type="file" class="topic-file-input" accept=".txt,.pdf">
+        </div>
+      </div>
+      <button class="add-more-btn" onclick="addFileInput()">+ Добавить файл</button>
+    </div>
+    
+    <div class="file-link-section">
+      <div class="section-label">Добавьте ссылки</div>
+      <div id="links-container">
+        <div class="link-item">
+          <input type="url" class="topic-link-input" placeholder="https://...">
+        </div>
+      </div>
+      <button class="add-more-btn" onclick="addLinkInput()">+ Добавить ссылку</button>
+    </div>
+    
+    <div class="file-link-section">
+      <div class="section-label">Создать список вопросов к теме</div>
+      <textarea class="form-input" id="topic-questions" placeholder="Введите вопросы, каждый с новой строки" rows="4"></textarea>
+    </div>
+    
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="closeModal('create-topic-modal')">Назад</button>
+      <button class="nav-btn" onclick="confirmCreateAndAssignTopic()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==================== КОНФИГУРАЦИЯ API ====================
+  const API_BASE_URL = '/api'; // Или ваш базовый URL
+  const TOKEN = localStorage.getItem('access_token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZWFjaGVyXzEyMzQ1NiIsInVzZXJfaWQiOjEsInVzZXJfdHlwZSI6InRlYWNoZXIiLCJleHAiOjk5OTk5OTk5OTl9.t0k3nE_m0zhF6BUO3Gk8XRCgZhO7YrKFhFLYQCgN_T8';
+
+  let currentClassObject = null;
+  let selectedClassIds = new Set();
+  let selectedStudentIds = new Set();
+  let expandedClasses = new Set();
+
+  // ==================== ФУНКЦИИ API (РЕАЛЬНЫЕ ЗАПРОСЫ) ====================
+
+  async function apiFetch(endpoint, options = {}) {
+    const headers = {
+      'Authorization': `Bearer ${TOKEN}`,
+      'Content-Type': 'application/json',
+      ...options.headers
+    };
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`API Error: ${response.status} - ${error}`);
+    }
+    
+    return response.status !== 204 ? await response.json() : null;
+  }
+
+  async function fetchTeacherClasses() {
+    return await apiFetch('/teacher/classes');
+  }
+
+  async function fetchClassStudents(classId) {
+    return await apiFetch(`/teacher/classes/${classId}/students`);
+  }
+
+  async function fetchTeacherTopics() {
+    return await apiFetch('/teacher/topics');
+  }
+
+  async function fetchOverallRating() {
+    return await apiFetch('/teacher/ratings/students');
+  }
+
+  async function createClassroom(name) {
+    return await apiFetch('/teacher/classes', {
+      method: 'POST',
+      body: JSON.stringify({ name })
+    });
+  }
+
+  async function deleteClassroom(classId) {
+    await apiFetch(`/teacher/classes/${classId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async function generateStudentsForClass(classId, count) {
+    return await apiFetch(`/teacher/classes/${classId}/students/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ count })
+    });
+  }
+
+  async function deleteStudent(studentId) {
+    await apiFetch(`/teacher/students/${studentId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async function createTopic(title, description = '') {
+    return await apiFetch('/teacher/topics', {
+      method: 'POST',
+      body: JSON.stringify({ title, description })
+    });
+  }
+
+  async function addFileToTopic(topicId, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetch(`${API_BASE_URL}/teacher/topics/${topicId}/materials/file`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${TOKEN}` },
+      body: formData
+    });
+    
+    return await response.json();
+  }
+
+  async function addLinkToTopic(topicId, url, title = null) {
+    return await apiFetch(`/teacher/topics/${topicId}/materials/link`, {
+      method: 'POST',
+      body: JSON.stringify({ url, title })
+    });
+  }
+
+  async function addQuestionsToTopic(topicId, questions) {
+    const questionsArray = questions.split('\n').filter(q => q.trim()).map(text => ({ text: text.trim() }));
+    return await apiFetch(`/teacher/topics/${topicId}/questions`, {
+      method: 'POST',
+      body: JSON.stringify({ questions: questionsArray })
+    });
+  }
+
+  async function assignTopic(topicId, classIds, studentNumbers) {
+    return await apiFetch(`/teacher/topics/${topicId}/assign`, {
+      method: 'POST',
+      body: JSON.stringify({
+        class_ids: classIds,
+        student_numbers: studentNumbers
+      })
+    });
+  }
+
+  async function deleteTopicAssignment(topicId, studentId) {
+    // Удаление назначения темы ученику
+    await apiFetch(`/teacher/topics/${topicId}/assign/${studentId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+
+  async function getAssignedTopicsForSelection(classIds, studentIds) {
+    // Получаем все темы учителя
+    const allTopics = await fetchTeacherTopics();
+    
+    // Получаем назначенные темы для выбранных учеников
+    const assignedTopics = new Set();
+    
+    // Собираем student_numbers выбранных учеников
+    const studentNumbers = [];
+    for (const cls of await fetchTeacherClasses()) {
+      if (classIds.includes(cls.id)) {
+        const students = await fetchClassStudents(cls.id);
+        students.forEach(s => studentNumbers.push(s.student_number));
+      }
+    }
+    
+    // Добавляем отдельно выбранных учеников
+    for (const studentId of studentIds) {
+      for (const cls of await fetchTeacherClasses()) {
+        const students = await fetchClassStudents(cls.id);
+        const student = students.find(s => s.id === studentId);
+        if (student) studentNumbers.push(student.student_number);
+      }
+    }
+    
+    // Здесь нужен эндпоинт для получения назначенных тем по student_numbers
+    // Пока возвращаем все темы учителя
+    return allTopics;
+  }
+
+  // ==================== ОТРИСОВКА ====================
+
+  async function renderClassesList() {
+    const container = document.getElementById('classes-list');
+    if (!container) return;
+    
+    try {
+      const classes = await fetchTeacherClasses();
+      
+      if (!classes || classes.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет классов. Добавьте первый класс.</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      classes.forEach(cls => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <span class="card-title">Класс ${cls.name}</span>
+          <div class="card-actions">
+            <button class="btn" onclick="openClassInfo(${cls.id})">Инфо</button>
+            <button class="btn" onclick="handleDeleteClass(${cls.id})">Удалить</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Ошибка загрузки классов:', error);
+      container.innerHTML = '<div class="empty-state">Ошибка загрузки классов</div>';
+    }
+  }
+
+  async function renderRatingClassesList() {
+    const container = document.getElementById('rating-classes-list');
+    if (!container) return;
+    
+    try {
+      const classes = await fetchTeacherClasses();
+      
+      if (!classes || classes.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет классов.</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      classes.forEach(cls => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <span class="card-title">Класс ${cls.name}</span>
+          <div class="card-actions">
+            <button class="btn" onclick="showClassRating(${cls.id})">Рейтинг</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Ошибка загрузки классов:', error);
+    }
+  }
+
+  async function renderTopicsAssignList() {
+    const container = document.getElementById('topics-assign-list');
+    if (!container) return;
+    
+    try {
+      const classes = await fetchTeacherClasses();
+      
+      if (!classes || classes.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет классов для отображения</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      for (const cls of classes) {
+        const classCard = document.createElement('div');
+        classCard.className = 'card';
+        
+        const isExpanded = expandedClasses.has(cls.id);
+        const arrow = isExpanded ? '▼' : '▶';
+        
+        classCard.innerHTML = `
+          <div class="class-row">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <button class="expand-btn" onclick="toggleExpandClass(${cls.id})">${arrow}</button>
+              <span class="card-title">Класс ${cls.name}</span>
+            </div>
+            <div class="card-actions">
+              <button class="select-btn ${selectedClassIds.has(cls.id) ? 'selected' : ''}" 
+                      id="select-class-${cls.id}" 
+                      onclick="toggleSelectClass(${cls.id})">
+                ${selectedClassIds.has(cls.id) ? '✓ Выбран' : 'Выбрать'}
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(classCard);
+        
+        if (isExpanded) {
+          const students = await fetchClassStudents(cls.id);
+          students.forEach(student => {
+            const studentCard = document.createElement('div');
+            studentCard.className = 'card student-card-indent';
+            studentCard.innerHTML = `
+              <span class="card-title">Ученик ${student.student_number}</span>
+              <div class="card-actions">
+                <button class="select-btn ${selectedStudentIds.has(student.id) ? 'selected' : ''}" 
+                        id="select-student-${student.id}" 
+                        onclick="toggleSelectStudent(${student.id})">
+                  ${selectedStudentIds.has(student.id) ? '✓ Выбран' : 'Выбрать'}
+                </button>
+              </div>
+            `;
+            container.appendChild(studentCard);
+          });
+        }
+      }
+      
+      updateAssignButtonVisibility();
+    } catch (error) {
+      console.error('Ошибка загрузки списка:', error);
+    }
+  }
+
+  function updateAssignButtonVisibility() {
+    const btn = document.getElementById('assign-topic-btn');
+    if (selectedClassIds.size > 0 || selectedStudentIds.size > 0) {
+      btn.classList.remove('hidden');
+    } else {
+      btn.classList.add('hidden');
+    }
+  }
+
+  async function renderAssignedTopics() {
+    const container = document.getElementById('assigned-topics-list');
+    const classIds = Array.from(selectedClassIds);
+    const studentIds = Array.from(selectedStudentIds);
+    
+    try {
+      const topics = await getAssignedTopicsForSelection(classIds, studentIds);
+      
+      if (topics.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет назначенных тем</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      topics.forEach(topic => {
+        const card = document.createElement('div');
+        card.className = 'topic-card';
+        card.innerHTML = `
+          <span class="topic-card-title">${topic.title}</span>
+          <div class="card-actions">
+            <button class="btn" onclick="showTopicInfo(${topic.id})">Инфо</button>
+            <button class="btn" onclick="handleDeleteTopicAssignment(${topic.id})">Удалить</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Ошибка загрузки назначенных тем:', error);
+      container.innerHTML = '<div class="empty-state">Ошибка загрузки тем</div>';
+    }
+  }
+
+  // ==================== ОБРАБОТЧИКИ ====================
+
+  window.toggleExpandClass = function(classId) {
+    if (expandedClasses.has(classId)) {
+      expandedClasses.delete(classId);
+    } else {
+      expandedClasses.add(classId);
+    }
+    renderTopicsAssignList();
+  };
+
+  window.toggleSelectClass = function(classId) {
+    if (selectedClassIds.has(classId)) {
+      selectedClassIds.delete(classId);
+    } else {
+      selectedClassIds.add(classId);
+    }
+    renderTopicsAssignList();
+  };
+
+  window.toggleSelectStudent = function(studentId) {
+    if (selectedStudentIds.has(studentId)) {
+      selectedStudentIds.delete(studentId);
+    } else {
+      selectedStudentIds.add(studentId);
+    }
+    renderTopicsAssignList();
+  };
+
+  window.openAssignedTopicsModal = function() {
+    const className = selectedClassIds.size > 0 ? 'класса' : 'ученика';
+    document.getElementById('assigned-topics-header').textContent = `Назначенные темы ${className}`;
+    renderAssignedTopics();
+    document.getElementById('assigned-topics-modal').classList.add('active');
+  };
+
+  window.handleDeleteTopicAssignment = async function(topicId) {
+    if (!confirm('Удалить эту тему из назначенных?')) return;
+    
+    try {
+      // Удаляем назначение для всех выбранных учеников
+      for (const studentId of selectedStudentIds) {
+        await deleteTopicAssignment(topicId, studentId);
+      }
+      
+      // Для классов удаляем назначения всем ученикам класса
+      for (const classId of selectedClassIds) {
+        const students = await fetchClassStudents(classId);
+        for (const student of students) {
+          await deleteTopicAssignment(topicId, student.id);
+        }
+      }
+      
+      await renderAssignedTopics();
+      alert('Тема удалена из назначенных');
+    } catch (error) {
+      console.error('Ошибка удаления темы:', error);
+      alert('Ошибка при удалении темы');
+    }
+  };
+
+  window.showTopicInfo = function(topicId) {
+    // Здесь можно открыть модальное окно с информацией о теме
+    alert(`Информация о теме ID: ${topicId}`);
+  };
+
+  window.openCreateTopicModal = function() {
+    document.getElementById('new-topic-title').value = '';
+    document.getElementById('files-container').innerHTML = '<div class="file-item"><input type="file" class="topic-file-input" accept=".txt,.pdf"></div>';
+    document.getElementById('links-container').innerHTML = '<div class="link-item"><input type="url" class="topic-link-input" placeholder="https://..."></div>';
+    document.getElementById('topic-questions').value = '';
+    document.getElementById('create-topic-modal').classList.add('active');
+  };
+
+  window.addFileInput = function() {
+    const container = document.getElementById('files-container');
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = '<input type="file" class="topic-file-input" accept=".txt,.pdf">';
+    container.appendChild(div);
+  };
+
+  window.addLinkInput = function() {
+    const container = document.getElementById('links-container');
+    const div = document.createElement('div');
+    div.className = 'link-item';
+    div.innerHTML = '<input type="url" class="topic-link-input" placeholder="https://...">';
+    container.appendChild(div);
+  };
+
+  window.confirmCreateAndAssignTopic = async function() {
+    const title = document.getElementById('new-topic-title').value.trim();
+    if (!title) {
+      alert('Введите название темы');
+      return;
+    }
+    
+    try {
+      // 1. Создаем тему
+      const newTopic = await createTopic(title);
+      const topicId = newTopic.id;
+      
+      // 2. Загружаем файлы
+      const fileInputs = document.querySelectorAll('.topic-file-input');
+      for (const input of fileInputs) {
+        if (input.files.length > 0) {
+          await addFileToTopic(topicId, input.files[0]);
+        }
+      }
+      
+      // 3. Добавляем ссылки
+      const linkInputs = document.querySelectorAll('.topic-link-input');
+      for (const input of linkInputs) {
+        const url = input.value.trim();
+        if (url) {
+          await addLinkToTopic(topicId, url);
+        }
+      }
+      
+      // 4. Добавляем вопросы
+      const questions = document.getElementById('topic-questions').value.trim();
+      if (questions) {
+        await addQuestionsToTopic(topicId, questions);
+      }
+      
+      // 5. Назначаем тему выбранным классам и ученикам
+      const classIds = Array.from(selectedClassIds);
+      
+      // Собираем student_numbers
+      const studentNumbers = [];
+      
+      // Ученики из выбранных классов
+      for (const classId of classIds) {
+        const students = await fetchClassStudents(classId);
+        students.forEach(s => studentNumbers.push(s.student_number));
+      }
+      
+      // Отдельно выбранные ученики
+      for (const studentId of selectedStudentIds) {
+        for (const cls of await fetchTeacherClasses()) {
+          const students = await fetchClassStudents(cls.id);
+          const student = students.find(s => s.id === studentId);
+          if (student && !studentNumbers.includes(student.student_number)) {
+            studentNumbers.push(student.student_number);
+          }
+        }
+      }
+      
+      await assignTopic(topicId, classIds, studentNumbers);
+      
+      alert(`Тема "${title}" создана и назначена!\nКлассов: ${classIds.length}\nУчеников: ${studentNumbers.length}`);
+      closeModal('create-topic-modal');
+      await renderAssignedTopics();
+      
+    } catch (error) {
+      console.error('Ошибка создания темы:', error);
+      alert('Ошибка при создании темы: ' + error.message);
+    }
+  };
+
+  window.showOverallRating = async function() {
+    try {
+      const ratings = await fetchOverallRating();
+      document.getElementById('rating-classes-view').style.display = 'none';
+      document.getElementById('rating-table-view').style.display = 'block';
+      
+      const table = document.getElementById('rating-table');
+      const titleEl = document.getElementById('rating-view-title');
+      titleEl.textContent = 'Общий рейтинг всех учеников';
+      
+      if (!ratings.items || ratings.items.length === 0) {
+        table.innerHTML = '<tr><td colspan="10" style="padding: 40px; text-align: center;">Нет данных для отображения</td></tr>';
+        return;
+      }
+      
+      // Отрисовка таблицы рейтинга
+      let html = '<tr><th>Класс</th><th>ID ученика</th><th>Средний балл</th></tr>';
+      ratings.items.forEach(r => {
+        html += `<tr><td>${r.class_name || ''}</td><td>${r.student_number}</td><td>${r.average_score || '-'}</td></tr>`;
+      });
+      table.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Ошибка загрузки рейтинга:', error);
+    }
+  };
+
+  window.showClassRating = async function(classId) {
+    try {
+      const students = await fetchClassStudents(classId);
+      document.getElementById('rating-classes-view').style.display = 'none';
+      document.getElementById('rating-table-view').style.display = 'block';
+      
+      const table = document.getElementById('rating-table');
+      const titleEl = document.getElementById('rating-view-title');
+      
+      const classObj = (await fetchTeacherClasses()).find(c => c.id === classId);
+      titleEl.textContent = `Рейтинг класса ${classObj?.name || ''}`;
+      
+      let html = '<tr><th>ID ученика</th><th>Средний балл</th></tr>';
+      students.forEach(s => {
+        html += `<tr><td>${s.student_number}</td><td>${s.average_score || '-'}</td></tr>`;
+      });
+      table.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Ошибка загрузки рейтинга класса:', error);
+    }
+  };
+
+  window.backToRatingClasses = function() {
+    document.getElementById('rating-classes-view').style.display = 'block';
+    document.getElementById('rating-table-view').style.display = 'none';
+    renderRatingClassesList();
+  };
+
+  window.openAddClassModal = function() {
+    document.getElementById('class-name-input').value = '';
+    document.getElementById('students-count').value = '';
+    document.getElementById('add-class-modal').classList.add('active');
+  };
+
+  window.confirmAddClass = async function() {
+    const name = document.getElementById('class-name-input').value.trim();
+    const count = parseInt(document.getElementById('students-count').value, 10);
+    
+    if (!name) { alert('Введите название класса'); return; }
+    if (isNaN(count) || count < 1 || count > 50) { alert('Введите количество учеников от 1 до 50'); return; }
+    
+    try {
+      const newClass = await createClassroom(name);
+      await generateStudentsForClass(newClass.id, count);
+      
+      closeModal('add-class-modal');
+      await renderClassesList();
+      await renderRatingClassesList();
+      alert(`Класс "${name}" создан с ${count} учениками.`);
+    } catch (error) {
+      console.error('Ошибка создания класса:', error);
+      alert('Ошибка при создании класса');
+    }
+  };
+
+  window.handleDeleteClass = async function(classId) {
+    if (!confirm('Удалить класс? Все ученики класса будут также удалены.')) return;
+    
+    try {
+      await deleteClassroom(classId);
+      await renderClassesList();
+      await renderRatingClassesList();
+      selectedClassIds.delete(classId);
+      expandedClasses.delete(classId);
+    } catch (error) {
+      console.error('Ошибка удаления класса:', error);
+      alert('Ошибка при удалении класса');
+    }
+  };
+
+  window.openClassInfo = async function(classId) {
+    try {
+      const classes = await fetchTeacherClasses();
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      
+      currentClassObject = classObj;
+      
+      document.getElementById('class-info-header').textContent = `Класс ${classObj.name}`;
+      document.getElementById('add-students-header').textContent = `Класс ${classObj.name}`;
+      
+      const students = await fetchClassStudents(classId);
+      const container = document.getElementById('students-in-class');
+      
+      if (!students || students.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет учеников.</div>';
+      } else {
+        container.innerHTML = '';
+        students.forEach(student => {
+          const card = document.createElement('div');
+          card.className = 'student-card';
+          card.innerHTML = `
+            <div class="student-info">
+              <div class="student-field"><span class="student-field-label">ID ученика:</span> ${student.student_number}</div>
+              <div class="student-field"><span class="student-field-label">Пароль:</span> ${student.password || '********'}</div>
+            </div>
+            <button class="delete-small-btn" onclick="handleDeleteStudent(${student.id})">Удалить</button>
+          `;
+          container.appendChild(card);
+        });
+      }
+      
+      document.getElementById('class-info-modal').classList.add('active');
+    } catch (error) {
+      console.error('Ошибка загрузки информации о классе:', error);
+    }
+  };
+
+  window.handleDeleteStudent = async function(studentId) {
+    if (!confirm('Удалить ученика?')) return;
+    
+    try {
+      await deleteStudent(studentId);
+      
+      if (currentClassObject) {
+        await openClassInfo(currentClassObject.id);
+      }
+      selectedStudentIds.delete(studentId);
+    } catch (error) {
+      console.error('Ошибка удаления ученика:', error);
+      alert('Ошибка при удалении ученика');
+    }
+  };
+
+  window.openAddStudentsModal = function() {
+    if (!currentClassObject) { alert('Класс не выбран'); return; }
+    document.getElementById('add-students-count').value = '';
+    document.getElementById('add-students-modal').classList.add('active');
+  };
+
+  window.confirmAddStudents = async function() {
+    if (!currentClassObject) { closeModal('add-students-modal'); return; }
+    
+    const count = parseInt(document.getElementById('add-students-count').value, 10);
+    if (isNaN(count) || count < 1 || count > 50) { alert('Введите количество от 1 до 50'); return; }
+    
+    try {
+      await generateStudentsForClass(currentClassObject.id, count);
+      
+      closeModal('add-students-modal');
+      await openClassInfo(currentClassObject.id);
+      alert(`Добавлено ${count} учеников`);
+    } catch (error) {
+      console.error('Ошибка добавления учеников:', error);
+      alert('Ошибка при добавлении учеников');
+    }
+  };
+
+  window.downloadClassList = function() {
+    if (!currentClassObject) { alert('Класс не выбран'); return; }
+    
+    // Здесь должен быть запрос к API для получения списка с паролями
+    alert('Функция скачивания списка класса');
+  };
+
+  window.closeModal = function(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    if (modalId === 'class-info-modal') currentClassObject = null;
+  };
+
+  // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+  function initTabs() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        panels.forEach(p => p.classList.remove('active'));
+        
+        if (targetTab === 'students') {
+          document.getElementById('students').classList.add('active');
+          renderClassesList();
+        } else if (targetTab === 'rating') {
+          document.getElementById('rating').classList.add('active');
+          document.getElementById('rating-classes-view').style.display = 'block';
+          document.getElementById('rating-table-view').style.display = 'none';
+          renderRatingClassesList();
+        } else if (targetTab === 'topics') {
+          document.getElementById('topics').classList.add('active');
+          renderTopicsAssignList();
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Проверяем наличие токена
+    if (!TOKEN) {
+      alert('Необходима авторизация');
+      window.location.href = 'login_teacher.html';
+      return;
+    }
+    
+    renderClassesList();
+    renderRatingClassesList();
+    initTabs();
+  });
+</script>
+</body>
+</html>
