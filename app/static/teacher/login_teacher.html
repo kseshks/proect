@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход учителя | Vie</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            position: relative;
+            width: 1440px;
+            height: 1024px;
+            background: #A7AADB;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        /* Окно входа */
+        .login-card {
+            box-sizing: border-box;
+            position: absolute;
+            width: 400px;
+            height: 500px;
+            left: 520px;
+            top: 262px;
+            background: #FFFFFF;
+            border: 5px solid #797FE0;
+            border-radius: 30px;
+            padding: 37px 34px;
+        }
+
+        .title {
+            width: 322px;
+            height: 81px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 32px;
+            line-height: 39px;
+            display: flex;
+            align-items: center;
+            color: #13164B;
+            margin-bottom: 0;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-label {
+            width: 200px;
+            height: 24px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            color: #13164B;
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            box-sizing: border-box;
+            width: 333px;
+            height: 60px;
+            background: #A7AADB;
+            border: 1px solid #13164B;
+            border-radius: 30px;
+            padding: 0 24px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            color: #13164B;
+            outline: none;
+        }
+
+        .input-field::placeholder {
+            color: rgba(19, 22, 75, 0.6);
+        }
+
+        .input-field:focus {
+            border-width: 2px;
+            background: #b8bbe8;
+        }
+
+        .login-btn {
+            box-sizing: border-box;
+            position: absolute;
+            width: 197px;
+            height: 41px;
+            left: 102px;
+            bottom: 57px;
+            background: transparent;
+            border: 1px solid #797FE0;
+            border-radius: 30px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #000000;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:hover {
+            background: #A7AADB;
+            border-color: #13164B;
+            color: #13164B;
+        }
+
+        .login-btn:active {
+            background: #979bc9;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            position: absolute;
+            width: 255px;
+            height: 56px;
+            left: 1185px;
+            top: 960px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #13164B;
+        }
+
+        .error-message {
+            position: absolute;
+            width: 333px;
+            height: 20px;
+            left: 34px;
+            top: 345px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 17px;
+            color: #ff4444;
+            text-align: center;
+        }
+
+        .back-link {
+            position: absolute;
+            left: 520px;
+            top: 780px;
+            width: 400px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #13164B;
+            text-decoration: none;
+            opacity: 0.7;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #13164B;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="title">Учитель</div>
+
+        <form id="loginForm">
+            <!-- Поле "Введите логин" -->
+            <div class="input-group">
+                <div class="input-label">Введите логин</div>
+                <input type="text" id="username" name="username" class="input-field" placeholder="логин" autocomplete="username" required>
+            </div>
+
+            <!-- Поле "Введите пароль" -->
+            <div class="input-group">
+                <div class="input-label">Введите пароль</div>
+                <input type="password" id="password" name="password" class="input-field" placeholder="••••••••" autocomplete="current-password" required>
+            </div>
+
+            <!-- Блок для отображения ошибок -->
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Кнопка "Войти" -->
+            <button type="submit" class="login-btn" id="submitBtn">Войти</button>
+        </form>
+    </div>
+
+    <!-- Ссылка "Вернуться на главную" -->
+    <a href="/" class="back-link">← Вернуться на главную</a>
+
+    <!-- Подпись "Made by Vie" -->
+    <div class="footer">Made by Vie</div>
+
+    <script>
+        (function() {
+            const form = document.getElementById('loginForm');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const errorElement = document.getElementById('errorMessage');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                errorElement.textContent = '';
+                
+                // Простейшая валидация
+                if (!username || !password) {
+                    errorElement.textContent = 'Введите логин и пароль';
+                    return;
+                }
+                
+                // Закомментированная логика входа через API
+                /*
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = 'Вход...<span class="spinner"></span>';
+                    
+                    const response = await fetch('/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.access_token) {
+                        localStorage.setItem('access_token', data.access_token);
+                        localStorage.setItem('token_type', data.token_type);
+                        localStorage.setItem('user_type', data.user_type);
+                        
+                        if (data.user_type === 'teacher') {
+                            window.location.href = '../teacher/teacher_dashboard.html';
+                        } else {
+                            errorElement.textContent = 'Ошибка: неверный тип пользователя';
+                        }
+                    } else {
+                        errorElement.textContent = data.detail || 'Неверный логин или пароль';
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    errorElement.textContent = 'Ошибка соединения с сервером';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Войти';
+                }
+                */
+                
+                // Временно: прямой переход на дашборд учителя (мок)
+                localStorage.setItem('user_type', 'teacher');
+                localStorage.setItem('teacher_login', username);
+                window.location.href = '../teacher/teacher_dashboard.html';
+            });
+        })();
+    </script>
+
+</body>
+</html>

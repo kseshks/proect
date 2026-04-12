@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход ученика | Vie</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            position: relative;
+            width: 1440px;
+            height: 1024px;
+            background: #A7AADB;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .login-card {
+            box-sizing: border-box;
+            position: absolute;
+            width: 400px;
+            height: 500px;
+            left: 520px;
+            top: 262px;
+            background: #FFFFFF;
+            border: 5px solid #797FE0;
+            border-radius: 30px;
+            padding: 37px 34px;
+        }
+
+        .title {
+            width: 322px;
+            height: 81px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 32px;
+            line-height: 39px;
+            display: flex;
+            align-items: center;
+            color: #13164B;
+            margin-bottom: 0;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-label {
+            width: 200px;
+            height: 24px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            color: #13164B;
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            box-sizing: border-box;
+            width: 333px;
+            height: 60px;
+            background: #DDE8FB;
+            border: 1px solid #13164B;
+            border-radius: 30px;
+            padding: 0 24px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            color: #13164B;
+            outline: none;
+        }
+
+        .input-field::placeholder {
+            color: rgba(19, 22, 75, 0.6);
+        }
+
+        .input-field:focus {
+            border-width: 2px;
+            background: #c9d6f7;
+        }
+
+        .login-btn {
+            box-sizing: border-box;
+            position: absolute;
+            width: 197px;
+            height: 41px;
+            left: 102px;
+            bottom: 57px;
+            background: transparent;
+            border: 1px solid #797FE0;
+            border-radius: 30px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #000000;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:hover {
+            background: #DDE8FB;
+            border-color: #13164B;
+            color: #13164B;
+        }
+
+        .login-btn:active {
+            background: #c0cef0;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            position: absolute;
+            width: 255px;
+            height: 56px;
+            left: 1185px;
+            top: 960px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #13164B;
+        }
+
+        .error-message {
+            position: absolute;
+            width: 333px;
+            height: 20px;
+            left: 34px;
+            top: 345px;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 17px;
+            color: #ff4444;
+            text-align: center;
+        }
+
+        .back-link {
+            position: absolute;
+            left: 520px;
+            top: 780px;
+            width: 400px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #13164B;
+            text-decoration: none;
+            opacity: 0.7;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .input-field[type="text"]::placeholder {
+            content: "ID";
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="title">Ученик</div>
+
+        <form id="studentLoginForm">
+            <div class="input-group">
+                <div class="input-label">Введите ID</div>
+                <input type="text" id="studentId" name="studentId" class="input-field" placeholder="ID" autocomplete="off" required>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Введите пароль</div>
+                <input type="password" id="studentPassword" name="password" class="input-field" placeholder="••••••••" autocomplete="current-password" required>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <button type="submit" class="login-btn" id="submitBtn">Войти</button>
+        </form>
+    </div>
+
+    <a href="/" class="back-link">← Вернуться на главную</a>
+
+    <div class="footer">Made by Vie</div>
+
+    <script>
+        document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Закомментированная логика входа
+            /*
+            const studentId = document.getElementById('studentId').value.trim();
+            const password = document.getElementById('studentPassword').value;
+            const errorElement = document.getElementById('errorMessage');
+            
+            errorElement.textContent = '';
+            
+            if (!studentId || !password) {
+                errorElement.textContent = 'Введите ID и пароль';
+                return;
+            }
+            
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: studentId,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token) {
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('token_type', data.token_type);
+                    localStorage.setItem('user_type', data.user_type);
+                    localStorage.setItem('student_id', studentId);
+                    window.location.href = '../student/student_dashboard.html';
+                } else {
+                    errorElement.textContent = data.detail || 'Неверный ID или пароль';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                errorElement.textContent = 'Ошибка соединения с сервером';
+            });
+            */
+            
+            location.href = '../student/student_themes.html';
+        });
+    </script>
+
+</body>
+</html>
