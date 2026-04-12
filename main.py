@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.endpoints import auth, admin, teacher, student
 
@@ -22,9 +23,13 @@ app.include_router(admin.router)
 app.include_router(teacher.router)
 app.include_router(student.router)
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+
 @app.get("/")
 def root():
     return {"status": "ok", "message": "API is running"}
+
 
 @app.get("/health")
 def health():

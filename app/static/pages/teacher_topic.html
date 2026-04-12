@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тема учителя</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="../css/components/forms.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-container" style="padding: 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+                <div>
+                    <h2 id="topic-title">Тема</h2>
+                    <p id="topic-description"></p>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" onclick="goBack()">Назад</button>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <!-- Материалы -->
+                <div style="background:white; border-radius:20px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3>Материалы</h3>
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <input type="text" id="linkTitle" placeholder="Название ссылки" style="margin-bottom:8px; width:100%;">
+                        <input type="text" id="linkUrl" placeholder="https://example.com" style="margin-bottom:8px; width:100%;">
+                        <button type="button" onclick="addLink()">Добавить ссылку</button>
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <input type="file" id="topicFile" style="margin-bottom:8px; width:100%;">
+                        <button type="button" onclick="uploadFile()">Загрузить файл</button>
+                    </div>
+
+                    <div id="materials-list">
+                        <p>Загрузка...</p>
+                    </div>
+                </div>
+
+                <!-- Вопросы -->
+                <div style="background:white; border-radius:20px; padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3>Вопросы</h3>
+                    </div>
+
+                    <div style="margin-bottom:16px;">
+                        <textarea id="questionsInput" rows="6" placeholder="Каждый вопрос с новой строки" style="width:100%;"></textarea>
+                        <button type="button" style="margin-top:8px;" onclick="addQuestions()">Добавить вопросы</button>
+                    </div>
+
+                    <div id="questions-list">
+                        <p>Загрузка...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; background:white; border-radius:20px; padding:20px;">
+                <h3 style="margin-bottom:16px;">Назначение темы</h3>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div>
+                        <h4 style="margin-bottom:12px;">Классы</h4>
+                        <div id="classes-assign-list"></div>
+                    </div>
+
+                    <div>
+                        <h4 style="margin-bottom:12px;">Ученики</h4>
+                        <div id="students-assign-list"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top:16px;">
+                    <button type="button" onclick="assignTopic()">Назначить тему</button>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>Made by Vie</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/teacher.js"></script>
+    <script>
+        let selectedClassIds = new Set();
+        let selectedStudentNumbers = new Set();
+
+        function getSelectedTeacherTopicId() {
+            return localStorage.getItem("selected_teacher_topic_id");
+        }
+
+        function goBack() {
+            window.location.href = "/static/pages/teacher_dashboard.html";
+        }
+
+        async function renderTopicInfo() {
+            const topicId = getSelectedTeacherTopicId();
+
+            if (!topicId) {
+                alert("Тема не выбрана");
+                goBack();
+                return;
+            }
+
+            try {
+                const topic = await loadTeacherTopic(topicId);
+                document.getElementById("topic-title").textContent = topic.title;
+                document.getElementById("topic-description").textContent = topic.description || "";
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function renderMaterials() {
+            const topicId = getSelectedTeacherTopicId();
+
+            try {
+                const materials = await loadTeacherTopicMaterials(topicId);
+                const container = document.getElementById("materials-list");
+                container.innerHTML = "";
+
+                if (!materials.length) {
+                    container.innerHTML = "<p>Материалов пока нет</p>";
+                    return;
+                }
+
+                materials.forEach(material => {
+                    const row = document.createElement("div");
+                    row.style.display = "flex";
+                    row.style.justifyContent = "space-between";
+                    row.style.alignItems = "center";
+                    row.style.gap = "12px";
+                    row.style.padding = "10px 0";
+                    row.style.borderBottom = "1px solid #e5e7eb";
+
+                    const text = material.material_type === "link"
+                        ? `${material.title || "Ссылка"}: ${material.url || ""}`
+                        : `${material.title || "Файл"}`;
+
+                    row.innerHTML = `
+                        <div>${text}</div>
+                        <button type="button" onclick="removeMaterial(${material.id})">Удалить</button>
+                    `;
+
+                    container.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById("materials-list").innerHTML = `<p>${error.message}</p>`;
+            }
+        }
+
+        async function renderQuestions() {
+            const topicId = getSelectedTeacherTopicId();
+
+            try {
+                const questions = await loadTeacherTopicQuestions(topicId);
+                const container = document.getElementById("questions-list");
+                container.innerHTML = "";
+
+                if (!questions.length) {
+                    container.innerHTML = "<p>Вопросов пока нет</p>";
+                    return;
+                }
+
+                questions.forEach(question => {
+                    const row = document.createElement("div");
+                    row.style.display = "flex";
+                    row.style.justifyContent = "space-between";
+                    row.style.alignItems = "center";
+                    row.style.gap = "12px";
+                    row.style.padding = "10px 0";
+                    row.style.borderBottom = "1px solid #e5e7eb";
+
+                    row.innerHTML = `
+                        <div>${question.text}</div>
+                        <button type="button" onclick="removeQuestion(${question.id})">Удалить</button>
+                    `;
+
+                    container.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById("questions-list").innerHTML = `<p>${error.message}</p>`;
+            }
+        }
+
+        async function renderAssignmentData() {
+            try {
+                const classes = await loadTeacherClasses();
+                const classesContainer = document.getElementById("classes-assign-list");
+                const studentsContainer = document.getElementById("students-assign-list");
+
+                classesContainer.innerHTML = "";
+                studentsContainer.innerHTML = "";
+
+                if (!classes.length) {
+                    classesContainer.innerHTML = "<p>Классов пока нет</p>";
+                    studentsContainer.innerHTML = "<p>Учеников пока нет</p>";
+                    return;
+                }
+
+                for (const classroom of classes) {
+                    const classRow = document.createElement("label");
+                    classRow.style.display = "block";
+                    classRow.style.marginBottom = "8px";
+                    classRow.innerHTML = `
+                        <input type="checkbox" value="${classroom.id}" onchange="toggleClassSelection(${classroom.id}, this.checked)">
+                        ${classroom.name}
+                    `;
+                    classesContainer.appendChild(classRow);
+
+                    const students = await loadTeacherClassStudents(classroom.id);
+
+                    students.forEach(student => {
+                        const studentRow = document.createElement("label");
+                        studentRow.style.display = "block";
+                        studentRow.style.marginBottom = "8px";
+                        studentRow.innerHTML = `
+                            <input type="checkbox" value="${student.student_number}" onchange="toggleStudentSelection('${student.student_number}', this.checked)">
+                            ${student.student_number} (${classroom.name})
+                        `;
+                        studentsContainer.appendChild(studentRow);
+                    });
+                }
+            } catch (error) {
+                document.getElementById("classes-assign-list").innerHTML = `<p>${error.message}</p>`;
+                document.getElementById("students-assign-list").innerHTML = `<p>${error.message}</p>`;
+            }
+        }
+
+        function toggleClassSelection(classId, checked) {
+            if (checked) {
+                selectedClassIds.add(classId);
+            } else {
+                selectedClassIds.delete(classId);
+            }
+        }
+
+        function toggleStudentSelection(studentNumber, checked) {
+            if (checked) {
+                selectedStudentNumbers.add(studentNumber);
+            } else {
+                selectedStudentNumbers.delete(studentNumber);
+            }
+        }
+
+        async function addLink() {
+            const topicId = getSelectedTeacherTopicId();
+            const title = document.getElementById("linkTitle").value.trim();
+            const url = document.getElementById("linkUrl").value.trim();
+
+            if (!url) {
+                alert("Введите ссылку");
+                return;
+            }
+
+            try {
+                await addTeacherTopicLink(topicId, title || null, url);
+                document.getElementById("linkTitle").value = "";
+                document.getElementById("linkUrl").value = "";
+                await renderMaterials();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function uploadFile() {
+            const topicId = getSelectedTeacherTopicId();
+            const fileInput = document.getElementById("topicFile");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Выберите файл");
+                return;
+            }
+
+            try {
+                await uploadTeacherTopicFile(topicId, file);
+                fileInput.value = "";
+                await renderMaterials();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function addQuestions() {
+            const topicId = getSelectedTeacherTopicId();
+            const text = document.getElementById("questionsInput").value.trim();
+
+            if (!text) {
+                alert("Введите хотя бы один вопрос");
+                return;
+            }
+
+            const questions = text
+                .split("\n")
+                .map(item => item.trim())
+                .filter(Boolean)
+                .map(text => ({ text }));
+
+            if (!questions.length) {
+                alert("Нет корректных вопросов");
+                return;
+            }
+
+            try {
+                await addTeacherTopicQuestions(topicId, questions);
+                document.getElementById("questionsInput").value = "";
+                await renderQuestions();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function removeQuestion(questionId) {
+            if (!confirm("Удалить вопрос?")) {
+                return;
+            }
+
+            try {
+                await deleteTeacherQuestion(questionId);
+                await renderQuestions();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function removeMaterial(materialId) {
+            if (!confirm("Удалить материал?")) {
+                return;
+            }
+
+            try {
+                await deleteTeacherMaterial(materialId);
+                await renderMaterials();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function assignTopic() {
+            const topicId = getSelectedTeacherTopicId();
+
+            try {
+                await assignTeacherTopic(
+                    topicId,
+                    Array.from(selectedClassIds),
+                    Array.from(selectedStudentNumbers)
+                );
+
+                alert("Тема успешно назначена");
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function initPage() {
+            await renderTopicInfo();
+            await renderMaterials();
+            await renderQuestions();
+            await renderAssignmentData();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

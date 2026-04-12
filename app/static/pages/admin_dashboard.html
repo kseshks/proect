@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/components/buttons.css">
     <link rel="stylesheet" href="../css/components/cards.css">
     <link rel="stylesheet" href="../css/components/forms.css">
-    <link rel="stylesheet" href="../css/components/navigation.css">
+    <link rel="stylesheet" href="../css/components/navigations.css">
     <link rel="stylesheet" href="../css/components/tables.css">
     <link rel="stylesheet" href="../css/pages/admin_dashboard.css">
 </head>
@@ -16,16 +16,15 @@
         <div class="navbar">
             <button class="nav-btn active" data-tab="students">Ученики</button>
             <button class="nav-btn" data-tab="teachers">Учителя</button>
-            <button class="nav-btn" data-tab="themes">Темы</button>
-            <button class="logout-nav-btn" onclick="window.location.href='admin_login.html'">Выйти</button>
+            <button class="logout-nav-btn" type="button" onclick="logout()">Выйти</button>
         </div>
 
         <!-- Ученики -->
         <div class="section active" id="students-section">
             <h2>Ученики</h2>
             <div class="action-buttons">
-                <button class="action-btn" onclick="openAddStudentModal()">+ Добавить</button>
-                <button class="action-btn download-btn" id="downloadBtn">📥 Скачать</button>
+                <button class="action-btn" type="button" onclick="openAddStudentModal()">+ Добавить</button>
+                <button class="action-btn download-btn" type="button" id="downloadBtn">📥 Скачать последние данные</button>
             </div>
             <div class="list-container" id="studentsList"></div>
         </div>
@@ -34,152 +33,220 @@
         <div class="section" id="teachers-section">
             <h2>Учителя</h2>
             <div class="action-buttons">
-                <button class="action-btn" onclick="openAddTeacherModal()">+ Добавить учителя</button>
+                <button class="action-btn" type="button" onclick="openAddTeacherModal()">+ Добавить учителя</button>
             </div>
             <div class="list-container" id="teachersList"></div>
         </div>
+    </div>
 
-        <!-- Темы -->
-        <div class="section" id="themes-section">
-            <h2>Темы</h2>
-            <div class="action-buttons">
-                <button class="action-btn" onclick="openAddThemeModal()">+ Добавить тему</button>
-            </div>
-            <div class="themes-grid" id="themesList"></div>
+    <!-- Модалка учеников -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить учеников</h3>
+            <input type="text" id="studentClassName" placeholder="Название класса">
+            <input type="number" id="studentCount" placeholder="Количество">
+            <button type="button" onclick="addStudents()">Подтвердить</button>
+            <button type="button" onclick="closeModal('studentModal')">Назад</button>
         </div>
     </div>
-    <!-- Модалки -->
-    <div id="studentModal" class="modal"><div class="modal-content">
-        <h3>Добавить учеников</h3>
-        <input type="number" id="studentCount" placeholder="Количество">
-        <button onclick="addStudents()">Подтвердить</button>
-        <button onclick="closeModal('studentModal')">Назад</button>
-    </div></div>
 
-    <div id="teacherModal" class="modal"><div class="modal-content">
-        <h3>Добавить учителя</h3>
-        <input type="text" id="teacherName" placeholder="ФИО">
-        <button onclick="addTeacher()">Подтвердить</button>
-        <button onclick="closeModal('teacherModal')">Назад</button>
-    </div></div>
+    <!-- Модалка учителей -->
+    <div id="teacherModal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить учителя</h3>
+            <input type="number" id="teacherCount" placeholder="Количество">
+            <button type="button" onclick="addTeacher()">Подтвердить</button>
+            <button type="button" onclick="closeModal('teacherModal')">Назад</button>
+        </div>
+    </div>
 
-    <div id="themeModal" class="modal"><div class="modal-content">
-        <h3>Добавить тему</h3>
-        <input type="text" id="themeName" placeholder="Название">
-        <button onclick="addTheme()">Подтвердить</button>
-        <button onclick="closeModal('themeModal')">Назад</button>
-    </div></div>
-
-    <div id="teacherThemesModal" class="modal"><div class="modal-content">
-        <h3 id="teacherModalTitle">Темы учителя</h3>
-        <div id="teacherThemesList"></div>
-        <button onclick="closeModal('teacherThemesModal')">Назад</button>
-        <button id="deleteTeacherFromModal">Удалить учителя</button>
-    </div></div>
-
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/admin.js"></script>
     <script>
-        // Данные
-        let students = [123456, 123457, 123458, 123459, 123460];
-        let teachers = [
-            { id: 1, name: 'Иванов', themes: ['Наполеон'] },
-            { id: 2, name: 'Петров', themes: ['Наполеон'] }
-        ];
-        let themes = ['Наполеон', 'Вторая мировая'];
+        let lastGeneratedStudents = [];
 
-        // Рендер
-        function render() {
-            // Ученики
-            document.getElementById('studentsList').innerHTML = students.map(id => `
-                <div class="list-item">Ученик ${id} <button onclick="deleteStudent(${id})">Удалить</button></div>
-            `).join('');
-            
-            // Учителя
-            document.getElementById('teachersList').innerHTML = teachers.map(t => `
-                <div class="list-item">Учитель ${t.name} 
-                    <button onclick="viewTeacherThemes(${t.id})">Инфо</button>
-                    <button onclick="deleteTeacher(${t.id})">Удалить</button>
-                </div>
-            `).join('');
-            
-            // Темы
-            document.getElementById('themesList').innerHTML = themes.map(theme => `
-                <div class="theme-card">${theme} <button onclick="deleteTheme('${theme}')">Удалить</button></div>
-            `).join('');
+        async function renderStudents() {
+            try {
+                const students = await loadAdminStudents();
+                const container = document.getElementById("studentsList");
+                container.innerHTML = "";
+
+                if (!students.length) {
+                    container.innerHTML = "<p>Учеников пока нет</p>";
+                    return;
+                }
+
+                students.forEach(student => {
+                    const item = document.createElement("div");
+                    item.className = "list-item";
+                    item.innerHTML = `
+                        <span>Ученик ${student.student_number}</span>
+                        <button type="button" onclick="removeStudent(${student.id})">Удалить</button>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                alert(error.message);
+            }
         }
 
-        // Ученики
-        function addStudents() {
-            let count = parseInt(document.getElementById('studentCount').value);
-            let lastId = students[students.length-1] || 123456;
-            for(let i = 1; i <= count; i++) students.push(lastId + i);
-            render();
-            closeModal('studentModal');
-        }
-        function deleteStudent(id) { students = students.filter(s => s !== id); render(); }
-        
-        // Учителя
-        function addTeacher() {
-            let name = document.getElementById('teacherName').value;
-            let newId = Math.max(...teachers.map(t => t.id), 0) + 1;
-            teachers.push({ id: newId, name: name, themes: [] });
-            render();
-            closeModal('teacherModal');
-        }
-        function deleteTeacher(id) { teachers = teachers.filter(t => t.id !== id); render(); }
-        
-        function viewTeacherThemes(id) {
-            let teacher = teachers.find(t => t.id === id);
-            document.getElementById('teacherModalTitle').innerText = `Темы: ${teacher.name}`;
-            document.getElementById('teacherThemesList').innerHTML = teacher.themes.map(theme => `
-                <div>${theme} <button onclick="deleteTeacherTheme(${id}, '${theme}')">Удалить</button></div>
-            `).join('');
-            document.getElementById('deleteTeacherFromModal').onclick = () => { deleteTeacher(id); closeModal('teacherThemesModal'); };
-            openModal('teacherThemesModal');
-        }
-        function deleteTeacherTheme(teacherId, theme) {
-            let teacher = teachers.find(t => t.id === teacherId);
-            teacher.themes = teacher.themes.filter(t => t !== theme);
-            viewTeacherThemes(teacherId);
-            render();
-        }
-        
-        // Темы
-        function addTheme() {
-            let name = document.getElementById('themeName').value;
-            themes.push(name);
-            render();
-            closeModal('themeModal');
-        }
-        function deleteTheme(theme) { themes = themes.filter(t => t !== theme); render(); }
+        async function renderTeachers() {
+            try {
+                const teachers = await loadAdminTeachers();
+                const container = document.getElementById("teachersList");
+                container.innerHTML = "";
 
-        // Модалки
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function openAddStudentModal() { openModal('studentModal'); }
-        function openAddTeacherModal() { openModal('teacherModal'); }
-        function openAddThemeModal() { openModal('themeModal'); }
+                if (!teachers.length) {
+                    container.innerHTML = "<p>Учителей пока нет</p>";
+                    return;
+                }
 
-        // Скачивание
-        document.getElementById('downloadBtn').onclick = () => {
-            let text = students.map((id, i) => `${i+1}. Ученик ${id}`).join('\n');
-            let blob = new Blob([text], {type: 'text/plain'});
-            let a = document.createElement('a');
+                teachers.forEach(teacher => {
+                    const item = document.createElement("div");
+                    item.className = "list-item";
+                    item.innerHTML = `
+                        <span>Учитель ${teacher.login}</span>
+                        <button type="button" onclick="removeTeacher(${teacher.id})">Удалить</button>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function renderAll() {
+            await renderStudents();
+            await renderTeachers();
+        }
+
+        async function addStudents() {
+            const className = document.getElementById("studentClassName").value.trim();
+            const count = Number(document.getElementById("studentCount").value);
+
+            if (!className) {
+                alert("Введите название класса");
+                return;
+            }
+
+            if (!count || count < 1) {
+                alert("Введите корректное количество");
+                return;
+            }
+
+            try {
+                const result = await generateAdminStudents(className, count);
+                lastGeneratedStudents = result.students || [];
+
+                alert("Ученики успешно созданы");
+                closeModal("studentModal");
+                document.getElementById("studentClassName").value = "";
+                document.getElementById("studentCount").value = "";
+
+                await renderStudents();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function addTeacher() {
+            const count = Number(document.getElementById("teacherCount").value);
+
+            if (!count || count < 1) {
+                alert("Введите корректное количество");
+                return;
+            }
+
+            try {
+                await generateAdminTeachers(count);
+                alert("Учителя успешно созданы");
+
+                closeModal("teacherModal");
+                document.getElementById("teacherCount").value = "";
+
+                await renderTeachers();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function removeStudent(studentId) {
+            if (!confirm("Удалить ученика?")) {
+                return;
+            }
+
+            try {
+                await deleteAdminStudent(studentId);
+                await renderStudents();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function removeTeacher(teacherId) {
+            if (!confirm("Удалить учителя?")) {
+                return;
+            }
+
+            try {
+                await deleteAdminTeacher(teacherId);
+                await renderTeachers();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = "flex";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        function openAddStudentModal() {
+            openModal("studentModal");
+        }
+
+        function openAddTeacherModal() {
+            openModal("teacherModal");
+        }
+
+        document.getElementById("downloadBtn").onclick = () => {
+            if (!lastGeneratedStudents.length) {
+                alert("Сначала сгенерируйте учеников");
+                return;
+            }
+
+            const text = lastGeneratedStudents
+                .map((student, index) => `${index + 1}. ID: ${student.student_number} | Пароль: ${student.password}`)
+                .join("\n");
+
+            const blob = new Blob([text], { type: "text/plain" });
+            const a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
-            a.download = 'students.txt';
+            a.download = "students_credentials.txt";
             a.click();
         };
 
-        // Вкладки
-        document.querySelectorAll('.nav-btn').forEach(btn => {
+        document.querySelectorAll(".nav-btn").forEach(btn => {
             btn.onclick = () => {
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                document.getElementById(btn.dataset.tab + '-section').classList.add('active');
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+                document.querySelectorAll(".section").forEach(section => {
+                    section.classList.remove("active");
+                });
+
+                document.getElementById(btn.dataset.tab + "-section").classList.add("active");
+
+                document.querySelectorAll(".nav-btn").forEach(button => {
+                    button.classList.remove("active");
+                });
+
+                btn.classList.add("active");
             };
         });
 
-        render();
+        renderAll();
     </script>
 </body>
 </html>

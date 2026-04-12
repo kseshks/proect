@@ -14,19 +14,52 @@
     <div class="container">
         <div class="login-card">
             <h2>Окно входа ученика</h2>
+
             <div class="role-switch">
-                <button class="role-btn" onclick="window.location.href='admin_login.html'">Войти как администратор</button>
-                <button class="role-btn" onclick="window.location.href='teacher_login.html'">Войти как учитель</button>
+                <button class="role-btn" type="button" onclick="window.location.href='admin_login.html'">
+                    Войти как администратор
+                </button>
+                <button class="role-btn" type="button" onclick="window.location.href='teacher_login.html'">
+                    Войти как учитель
+                </button>
             </div>
-            <div class="login-form">
-                <label for="student-id">Введите код ID</label>
-                <input type="text" id="student-id" placeholder="Введите ваш ID" class="form-input">
-                <button class="submit-btn" onclick="window.location.href='student_dashboard.html'">Войти</button>
-            </div>
+
+            <form id="student-login-form">
+                <input id="student-id" type="text" placeholder="Введите ID ученика" />
+                <input id="student-password" type="password" placeholder="Введите пароль" />
+                <button type="submit">Войти</button>
+            </form>
+
             <div class="footer">
                 <p>Made by Vie</p>
             </div>
         </div>
     </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        const form = document.getElementById("student-login-form");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const identifier = document.getElementById("student-id").value.trim();
+            const password = document.getElementById("student-password").value;
+
+            try {
+                const data = await login(identifier, password);
+
+                if (data.user_type !== "student") {
+                    alert("Это не ученик");
+                    return;
+                }
+
+                window.location.href = "/static/pages/student_dashboard.html";
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
 </body>
 </html>

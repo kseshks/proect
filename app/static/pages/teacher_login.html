@@ -14,22 +14,53 @@
     <div class="container">
         <div class="login-card">
             <h2>Окно входа учителя</h2>
+
             <div class="role-switch">
-                <button class="role-btn" onclick="window.location.href='admin_login.html'">Войти как администратор</button>
-                <button class="role-btn" onclick="window.location.href='student_login.html'">Войти как ученик</button>
+                <button class="role-btn" type="button" onclick="window.location.href='admin_login.html'">
+                    Войти как администратор
+                </button>
+                <button class="role-btn" type="button" onclick="window.location.href='student_login.html'">
+                    Войти как ученик
+                </button>
             </div>
 
-            <div class="login-form">
+            <form id="teacher-login-form" class="login-form">
                 <label>Введите логин и пароль</label>
-                <input type="text" placeholder="Введите логин" class="form-input">
-                <input type="password" placeholder="Введите пароль" class="form-input">
-                <button class="submit-btn" onclick="window.location.href='teacher_dashboard.html'">Войти</button>
-            </div>
-            
+                <input id="teacher-login" type="text" placeholder="Введите логин" class="form-input">
+                <input id="teacher-password" type="password" placeholder="Введите пароль" class="form-input">
+                <button class="submit-btn" type="submit">Войти</button>
+            </form>
+
             <div class="footer">
                 <p>Made by Vie</p>
             </div>
         </div>
     </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        const form = document.getElementById("teacher-login-form");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const identifier = document.getElementById("teacher-login").value.trim();
+            const password = document.getElementById("teacher-password").value;
+
+            try {
+                const data = await login(identifier, password);
+
+                if (data.user_type !== "teacher") {
+                    alert("Это не учитель");
+                    return;
+                }
+
+                window.location.href = "/static/pages/teacher_dashboard.html";
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
 </body>
 </html>
