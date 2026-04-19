@@ -1,0 +1,1070 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --bg-color: #A7AADB;
+    --primary: #13164B;
+    --white: #FFFFFF;
+    --btn-bg: #DDE8FB;
+    --radius-lg: 30px;
+    --radius-md: 20px;
+    --sidebar-width: 220px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-layout {
+    display: flex;
+    height: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Боковая панель */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100%;
+    border-right: 3px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+    flex-shrink: 0;
+    background: var(--bg-color);
+    z-index: 10;
+}
+
+.tab-btn {
+    width: 100%;
+    height: 64px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--primary);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    position: relative;
+}
+
+.tab-btn:first-child {
+    border-top: 2px solid var(--primary);
+    margin-top: 380px;
+}
+
+.tab-btn.active {
+    background: var(--white);
+    font-weight: 600;
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Кнопка выхода */
+.logout-btn {
+    width: 100%;
+    height: 56px;
+    margin-top: auto;
+    margin-bottom: 20px;
+    background: transparent;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 80px;
+    position: relative;
+}
+
+.tab-panel {
+    display: none;
+    width: 100%;
+    max-width: 860px;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-panel.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Заголовок панели */
+.panel-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.panel-header h2 {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Контейнер списка */
+.list-container {
+    width: 100%;
+    min-height: 540px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 35px;
+    position: relative;
+    background: transparent;
+}
+
+.scrollbar-visual {
+    position: absolute;
+    right: 18px;
+    top: 35px;
+    width: 14px;
+    height: calc(100% - 70px);
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+}
+
+.cards-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 470px;
+    overflow-y: auto;
+    padding-right: 30px;
+}
+
+.cards-wrapper::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+/* Карточка */
+.card {
+    height: 72px;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.card-title {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    height: 38px;
+    padding: 0 18px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    background: var(--btn-bg);
+    color: var(--primary);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: #c8d8f5;
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Кнопка добавления */
+.add-btn {
+    width: 560px;
+    height: 72px;
+    margin-top: 45px;
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+    background: #f0f4ff;
+    box-shadow: 0 4px 12px rgba(19, 22, 75, 0.15);
+}
+
+/* Footer */
+.footer {
+    position: absolute;
+    bottom: 24px;
+    right: 32px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+    opacity: 0.8;
+}
+
+/* Модальные окна */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(167, 170, 219, 0.95);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.class-header {
+    width: 100%;
+    max-width: 500px;
+    height: 64px;
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 40px;
+}
+
+.form-row {
+    width: 100%;
+    max-width: 500px;
+    height: 64px;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.form-input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    padding: 0 24px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--primary);
+    outline: none;
+    background: transparent;
+}
+
+.form-input::placeholder {
+    color: var(--primary);
+    opacity: 0.6;
+}
+
+textarea.form-input {
+    height: 120px;
+    padding: 20px 24px;
+    resize: vertical;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    width: 100%;
+    justify-content: center;
+}
+
+.nav-btn {
+    width: 200px;
+    height: 56px;
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #f0f4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(19, 22, 75, 0.15);
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+/* Адаптивность */
+@media (max-width: 1100px) {
+    .app-layout { flex-direction: column; }
+    .sidebar { 
+        width: 100%; 
+        height: auto; 
+        flex-direction: row; 
+        border-right: none; 
+        border-bottom: 3px solid var(--primary);
+        padding: 0;
+    }
+    .tab-btn { 
+        border-bottom: none; 
+        border-right: 2px solid var(--primary); 
+        width: 33.33%; 
+        margin-top: 0 !important; 
+    }
+    .tab-btn:first-child { border-top: none; margin-top: 0; }
+    .tab-btn:last-child { border-right: none; }
+    .logout-btn { display: none; }
+    .main-content { padding: 30px 20px; }
+    .list-container { padding: 20px; }
+    .add-btn { width: 100%; }
+    .nav-buttons { flex-direction: column; gap: 20px; }
+    .nav-btn { width: 100%; }
+}
+
+/* ==================== СТУДЕНТЫ В МОДАЛКЕ КЛАССА ==================== */
+.students-list-container {
+    width: 100%;
+    min-height: 400px;
+    max-height: 500px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    position: relative;
+    background: transparent;
+    overflow-y: auto;
+}
+
+/* Убираем внутренний скроллбар — используем основной */
+.students-list-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.students-list-container::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0;
+}
+
+.students-list-container::-webkit-scrollbar-thumb {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+}
+
+.students-cards-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Убираем max-height и overflow-y — скролл будет у родителя */
+}
+
+.student-card {
+    height: 56px;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.student-info {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+}
+
+.student-field {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.delete-small-btn {
+    width: 100px;
+    height: 32px;
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-small-btn:hover {
+    background: #ffcccc;
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+/* Убираем визуальный скроллбар (он не нужен) */
+.scrollbar-visual {
+    display: none;
+}
+
+#class-info-modal .modal-content {
+    max-width: 800px !important; /* Было 700px */
+}
+
+/* ==================== МОДАЛКА СОЗДАННЫХ УЧЕНИКОВ ==================== */
+#students-created-modal {
+    display: none;
+}
+
+#students-created-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.students-created-card {
+    box-sizing: border-box;
+    width: 500px;
+    max-height: 80vh;
+    background: var(--white);
+    border: 5px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 37px 34px;
+    animation: cardSlideUp 0.3s ease;
+    box-shadow: 0 10px 30px rgba(19, 22, 75, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes cardSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.students-created-title {
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.students-created-subtitle {
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--primary);
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+.students-list-container-modal {
+    max-height: 350px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    background: var(--bg-color);
+    padding: 15px;
+}
+
+.student-credential-item {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: var(--primary);
+}
+
+.student-credential-item:last-child { margin-bottom: 0; }
+
+.student-credential-login { font-weight: 600; }
+
+.student-credential-password {
+    font-family: monospace;
+    background: var(--btn-bg);
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.students-copy-btn {
+    width: 100%;
+    height: 48px;
+    margin-bottom: 20px;
+    background: transparent;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.students-copy-btn:hover {
+    background: var(--btn-bg);
+    transform: translateY(-2px);
+}
+
+.students-modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.students-modal-btn {
+    flex: 1;
+    height: 48px;
+    background: transparent;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.students-modal-btn:hover {
+    background: var(--btn-bg);
+    transform: translateY(-2px);
+}
+
+/* Уведомление */
+.copy-success {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: var(--white);
+    padding: 14px 28px;
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 500;
+    animation: fadeInOut 2s ease;
+    z-index: 9999;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, 20px); }
+    15% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* ==================== МОДАЛКА НАЗНАЧЕНИЯ ТЕМЫ ==================== */
+.assign-section {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.assign-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.assign-list-container {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.assign-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.assign-list-container::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.assign-class-item,
+.assign-student-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.assign-class-item:hover,
+.assign-student-item:hover {
+    background: #c8d8f5;
+    transform: translateY(-1px);
+}
+
+.assign-class-item.selected,
+.assign-student-item.selected {
+    background: var(--primary);
+    border-color: var(--white);
+}
+
+.assign-class-item.selected .assign-item-text,
+.assign-student-item.selected .assign-item-text {
+    color: var(--white);
+}
+
+.assign-item-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    accent-color: var(--primary);
+}
+
+.assign-item-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+    flex: 1;
+}
+
+.assign-class-item.selected .assign-item-text,
+.assign-student-item.selected .assign-item-text {
+    color: var(--white);
+}
+
+/* Кнопка назначения в карточке темы */
+.assign-btn {
+    background: var(--primary) !important;
+    color: var(--white) !important;
+}
+
+.assign-btn:hover {
+    background: #A7AADB !important;
+}
+/* Модалка темы */
+.topic-modal-header {
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.topic-modal-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.topic-modal-description {
+    font-size: 16px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+#topic-info-modal .modal-content {
+    padding: 20px 40px;
+}
+
+/* ==================== ОКНО ИНФОРМАЦИИ О ТЕМЕ ==================== */
+
+#topic-info-modal .modal-content {
+    padding: 30px 40px;
+    max-width: 1000px;
+    background: transparent;
+}
+
+.topic-modal-header {
+    width: 100%;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.topic-modal-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.topic-modal-description {
+    font-size: 16px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+/* Две колонки */
+.topic-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+/* Секция (Материалы / Вопросы) */
+.topic-section {
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.section-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Блок добавления материала */
+.material-add-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed var(--primary);
+}
+
+.material-add-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Списки материалов и вопросов */
+.materials-list,
+.questions-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.materials-list::-webkit-scrollbar,
+.questions-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.materials-list::-webkit-scrollbar-thumb,
+.questions-list::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+/* Карточка материала/вопроса */
+.list-item-card {
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list-item-card:last-child {
+    margin-bottom: 0;
+}
+
+.item-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary);
+    word-break: break-word;
+    flex: 1;
+    padding-right: 15px;
+}
+
+/* Секция назначения темы */
+.topic-assign-section {
+    width: 100%;
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    margin-top: 10px;
+}
+
+/* Две колонки для назначения */
+.assign-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.assign-column {
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 18px;
+}
+
+.assign-column-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.assign-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.assign-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.assign-list::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+/* Элемент выбора (класс/ученик) */
+.assign-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.assign-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(19, 22, 75, 0.1);
+}
+
+.assign-item.selected {
+    background: var(--primary);
+    border-color: var(--white);
+}
+
+.assign-item.selected .assign-text {
+    color: var(--white);
+}
+
+.assign-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.assign-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary);
+    flex: 1;
+}
+
+/* Кнопка назначения */
+.topic-assign-section .add-btn {
+    width: auto;
+    padding: 0 60px;
+    margin-top: 25px;
+    height: 56px;
+    font-size: 18px;
+}
+
+/* Кнопка назначения в карточке темы */
+.assign-btn {
+    background: var(--primary) !important;
+    color: var(--white) !important;
+    border-color: var(--primary) !important;
+}
+
+.assign-btn:hover {
+    background: #A7AADB !important;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
+    .topic-two-columns,
+    .assign-two-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    #topic-info-modal .modal-content {
+        padding: 20px;
+    }
+    
+    .topic-modal-title {
+        font-size: 26px;
+    }
+}
+
+.assign-btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+/* ==================== СКРОЛЛБАР В ОБЩЕМ СТИЛЕ (БЕЛЫЙ, ЗАКРУГЛЕННЫЙ) ==================== */
+
+/* Общий скроллбар для всего приложения */
+::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: 30px;
+    margin: 5px 0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: 30px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--btn-bg);
+}
+
+/* Для контейнеров внутри модалок */
+.materials-list::-webkit-scrollbar,
+.questions-list::-webkit-scrollbar,
+.assign-list::-webkit-scrollbar,
+.students-list-container::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+    width: 14px;
+}
+
+.materials-list::-webkit-scrollbar-track,
+.questions-list::-webkit-scrollbar-track,
+.assign-list::-webkit-scrollbar-track,
+.students-list-container::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: 30px;
+}
+
+.materials-list::-webkit-scrollbar-thumb,
+.questions-list::-webkit-scrollbar-thumb,
+.assign-list::-webkit-scrollbar-thumb,
+.students-list-container::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: 30px;
+}
+
+.materials-list::-webkit-scrollbar-thumb:hover,
+.questions-list::-webkit-scrollbar-thumb:hover,
+.assign-list::-webkit-scrollbar-thumb:hover,
+.students-list-container::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--btn-bg);
+}
+
+/* Убираем визуальный скроллбар (если есть) */
+.scrollbar-visual {
+    display: none !important;
+}

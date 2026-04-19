@@ -4,116 +4,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Диалог с ИИ</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/components/buttons.css">
-    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="student_dialog.css">
 </head>
 <body>
-    <div class="container">
-        <div class="dashboard-container" style="padding: 24px;">
-            <h2 id="topic-title">Тема</h2>
+    <div class="dialog-layout">
+        <!-- Заголовок -->
+        <div class="dialog-header">
+            <h1 class="dialog-title" id="topic-title">Тема</h1>
+            <p class="dialog-subtitle">Обучающая диалоговая система</p>
+        </div>
 
-            <div style="display:grid; grid-template-columns: 300px 1fr; gap: 20px; margin-top: 20px;">
-                <div style="background:white; border-radius:20px; padding:20px;">
-                    <h3>Доступные вопросы</h3>
-                    <div id="questions-list"></div>
+        <!-- Основной контент -->
+        <div class="dialog-main">
+            <!-- Левая колонка: вопросы -->
+            <div class="questions-panel">
+                <div class="panel-header">
+                    <h2>Доступные вопросы</h2>
+                </div>
+                <div class="questions-list" id="questions-list">
+                    <p class="empty-state">Загрузка вопросов...</p>
+                </div>
+            </div>
+
+            <!-- Правая колонка: диалог + поле ввода -->
+            <div class="chat-panel">
+                <div class="panel-header">
+                    <h2>Диалог</h2>
+                </div>
+                
+                <!-- История сообщений -->
+                <div class="chat-messages" id="chat-messages">
+                    <p class="empty-state">Задайте вопрос нейрорепетитору</p>
                 </div>
 
-                <div style="background:white; border-radius:20px; padding:20px;">
-                    <h3>Диалог</h3>
-                    <div id="chat-messages" style="max-height:500px; overflow:auto;"></div>
+                <!-- Поле ввода своего вопроса -->
+                <div class="chat-input-section">
+                    <div class="chat-input-wrapper">
+                        <input type="text" 
+                               class="chat-input" 
+                               id="custom-question" 
+                               placeholder="Задайте свой вопрос...">
+                        <button class="chat-send-btn" onclick="sendCustomQuestion()">Задать вопрос</button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div style="margin-top: 20px;">
-                <button type="button" onclick="window.location.href='/static/pages/student_dashboard.html'">Назад</button>
-            </div>
+        <!-- Кнопка назад -->
+        <div class="dialog-footer">
+            <button class="back-btn" onclick="goBack()">← Назад</button>
+        </div>
 
-            <div class="footer">
-                <p>Made by Vie</p>
-            </div>
+        <!-- Footer -->
+        <div class="footer">
+            <p>Made by Vie</p>
         </div>
     </div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/student.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/student.js"></script>
     <script>
-        async function renderTopic() {
-            const topicId = getSelectedTopic();
+        let currentTopicId = null;
 
-            if (!topicId) {
+        // ==================== НАВИГАЦИЯ ====================
+        function goBack() {
+            window.location.href = "student_dashboard.html";
+        }
+
+        // ==================== ЗАГРУЗКА ТЕМЫ ====================
+        async function renderTopic() {
+            currentTopicId = getSelectedTopic();
+
+            if (!currentTopicId) {
                 alert("Тема не выбрана");
-                window.location.href = "/static/pages/student_dashboard.html";
+                goBack();
                 return;
             }
 
             try {
-                const topic = await loadStudentTopic(topicId);
+                const topic = await loadStudentTopic(currentTopicId);
                 document.getElementById("topic-title").textContent = topic.title;
 
                 const questionsContainer = document.getElementById("questions-list");
                 questionsContainer.innerHTML = "";
 
+                if (!topic.questions || topic.questions.length === 0) {
+                    questionsContainer.innerHTML = '<p class="empty-state">Нет доступных вопросов</p>';
+                    return;
+                }
+
                 topic.questions.forEach(question => {
                     const btn = document.createElement("button");
-                    btn.type = "button";
+                    btn.className = "question-btn";
                     btn.textContent = question.text;
-                    btn.style.display = "block";
-                    btn.style.marginBottom = "10px";
-                    btn.onclick = async function () {
-                        await sendQuestion(topicId, question.id);
-                    };
+                    btn.onclick = () => sendQuestion(question.id);
                     questionsContainer.appendChild(btn);
                 });
             } catch (error) {
-                alert(error.message);
+                document.getElementById("questions-list").innerHTML = 
+                    `<p class="empty-state">Ошибка: ${error.message}</p>`;
             }
         }
 
+        // ==================== ЗАГРУЗКА ДИАЛОГА ====================
         async function renderDialog() {
-            const topicId = getSelectedTopic();
+            if (!currentTopicId) return;
 
             try {
-                const messages = await loadStudentDialog(topicId);
+                const messages = await loadStudentDialog(currentTopicId);
                 const container = document.getElementById("chat-messages");
                 container.innerHTML = "";
 
-                if (!messages.length) {
-                    container.innerHTML = "<p>История пуста</p>";
+                if (!messages || messages.length === 0) {
+                    container.innerHTML = '<p class="empty-state">Задайте вопрос нейрорепетитору</p>';
                     return;
                 }
 
                 messages.forEach(message => {
-                    const item = document.createElement("div");
-                    item.style.marginBottom = "16px";
-                    item.innerHTML = `
-                        <div style="margin-bottom:8px;">
-                            <strong>Вопрос:</strong> ${message.question_text}
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "chat-message";
+                    messageDiv.innerHTML = `
+                        <div class="message-question">
+                            <span class="message-label">Вопрос:</span>
+                            <span class="message-text">${message.question_text}</span>
                         </div>
-                        <div>
-                            <strong>Ответ:</strong> ${message.answer_text}
+                        <div class="message-answer">
+                            <span class="message-label">Ответ:</span>
+                            <span class="message-text">${message.answer_text}</span>
                         </div>
                     `;
-                    container.appendChild(item);
+                    container.appendChild(messageDiv);
                 });
 
                 container.scrollTop = container.scrollHeight;
             } catch (error) {
-                alert(error.message);
+                document.getElementById("chat-messages").innerHTML = 
+                    `<p class="empty-state">Ошибка загрузки диалога</p>`;
             }
         }
 
-        async function sendQuestion(topicId, questionId) {
+        // ==================== ОТПРАВКА ВОПРОСА ====================
+        async function sendQuestion(questionId) {
+            if (!currentTopicId) return;
+
             try {
-                await askStudentQuestion(topicId, questionId);
+                await askStudentQuestion(currentTopicId, questionId);
                 await renderDialog();
             } catch (error) {
-                alert(error.message);
+                alert("Ошибка: " + error.message);
             }
         }
 
-        renderTopic();
-        renderDialog();
+        // ==================== ОТПРАВКА СВОЕГО ВОПРОСА ====================
+        async function sendCustomQuestion() {
+            const input = document.getElementById("custom-question");
+            const questionText = input.value.trim();
+
+            if (!questionText) {
+                alert("Введите вопрос");
+                return;
+            }
+
+            if (!currentTopicId) {
+                alert("Тема не выбрана");
+                return;
+            }
+
+            try {
+                await askCustomQuestion(currentTopicId, questionText);
+                input.value = "";
+                await renderDialog();
+            } catch (error) {
+                alert("Ошибка: " + error.message);
+            }
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        async function initPage() {
+            await renderTopic();
+            await renderDialog();
+        }
+
+        initPage();
     </script>
 </body>
 </html>

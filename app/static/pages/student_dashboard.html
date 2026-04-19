@@ -4,30 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Темы ученика</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/components/buttons.css">
-    <link rel="stylesheet" href="../css/components/cards.css">
+    <link rel="stylesheet" href="student_dashboard.css">
 </head>
 <body>
-    <div class="container">
-        <div class="form-card">
-            <h2>Выбор темы</h2>
-
-            <div id="topics-list"></div>
-
-            <div style="margin-top: 20px;">
-                <button id="start-topic-btn" type="button">Начать</button>
-            </div>
-
-            <div class="footer">
-                <p>Made by Vie</p>
-            </div>
+    <div class="themes-container">
+        <div class="themes-wrapper" id="topics-list">
+            <!-- Темы будут загружены через JavaScript -->
         </div>
     </div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/student.js"></script>
+    <button class="start-btn" id="start-topic-btn">Начать</button>
+
+    <div class="footer">
+        <p>Made by Vie</p>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/student.js"></script>
     <script>
+        let selectedTopicId = null;
+
         async function renderTopics() {
             try {
                 const topics = await loadStudentTopics();
@@ -35,33 +32,34 @@
                 container.innerHTML = "";
 
                 if (!topics.length) {
-                    container.innerHTML = "<p>Тем пока нет</p>";
+                    container.innerHTML = '<div class="empty-state">Нет доступных тем</div>';
                     return;
                 }
 
                 topics.forEach(topic => {
-                    const item = document.createElement("div");
-                    item.style.marginBottom = "12px";
-
-                    item.innerHTML = `
-                        <div class="topic-card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px; background:white; border-radius:16px;">
-                            <div>
-                                <strong>${topic.title}</strong>
-                            </div>
-                            <button type="button" onclick="selectTopic(${topic.id})">Выбрать</button>
-                        </div>
+                    const card = document.createElement("div");
+                    card.className = "theme-card";
+                    card.innerHTML = `
+                        <span class="theme-title">${topic.title}</span>
+                        <button class="select-btn" data-topic-id="${topic.id}" onclick="selectTopic(${topic.id}, this)">Выбрать</button>
                     `;
-
-                    container.appendChild(item);
+                    container.appendChild(card);
                 });
             } catch (error) {
-                alert(error.message);
+                document.getElementById("topics-list").innerHTML = 
+                    `<div class="empty-state">Ошибка загрузки: ${error.message}</div>`;
             }
         }
 
-        function selectTopic(topicId) {
+        function selectTopic(topicId, btn) {
+            document.querySelectorAll('.select-btn').forEach(b => {
+                b.classList.remove('selected');
+            });
+            
+            // Добавляем класс selected текущей кнопке
+            btn.classList.add('selected');
+            selectedTopicId = topicId;
             setSelectedTopic(topicId);
-            alert("Тема выбрана");
         }
 
         document.getElementById("start-topic-btn").addEventListener("click", function () {
@@ -72,7 +70,7 @@
                 return;
             }
 
-            window.location.href = "/static/pages/student_dialog.html";
+            window.location.href = "student_dialog.html";
         });
 
         renderTopics();

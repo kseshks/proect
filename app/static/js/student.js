@@ -26,3 +26,10 @@ function setSelectedTopic(topicId) {
 function getSelectedTopic() {
     return localStorage.getItem("selected_topic_id");
 }
+
+async function askCustomQuestion(topicId, questionText) {
+    return apiRequest(`/student/topics/${topicId}/ask/custom`, {
+        method: "POST",
+        body: JSON.stringify({ question_text: questionText })
+    });
+}

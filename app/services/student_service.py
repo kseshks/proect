@@ -17,13 +17,13 @@ def get_student_topics(db: Session, student_id: int) -> list[dict]:
     result = []
     for assignment in assignments:
         topic = assignment.topic
-        questions_count = len([q for q in topic.questions if q.is_active])
-        result.append({
-            "id": topic.id,
-            "title": topic.title,
-            "description": topic.description,
-            "questions_count": questions_count
-        })
+        if topic:  # Проверка, что тема существует
+            result.append({
+                "id": topic.id,
+                "title": topic.title,
+                "description": topic.description,
+                "questions_count": len(topic.questions)  # ← Убрал is_active
+            })
     return result
 
 
@@ -51,14 +51,23 @@ def get_student_topic_detail(db: Session, student: Student, topic_id: int) -> di
         "title": topic.title,
         "description": topic.description,
         "materials": topic.materials,
-        "questions": sorted([q for q in topic.questions if q.is_active], key=lambda x: (x.sort_order, x.id))
+        "questions": topic.questions  # ← Убрал сортировку по sort_order и is_active
     }
 
 
 def get_student_dialog(db: Session, student: Student, topic_id: int) -> list[TopicDialogMessage]:
     get_student_topic_or_404(db, student, topic_id)
 
-    return cast(list[TopicDialogMessage], db.query(TopicDialogMessage).filter(TopicDialogMessage.topic_id == topic_id,TopicDialogMessage.student_id == student.id).order_by(TopicDialogMessage.id.asc()).all())
+    return cast(list[TopicDialogMessage], 
+        db.query(TopicDialogMessage)
+        .filter(
+            TopicDialogMessage.topic_id == topic_id,
+            TopicDialogMessage.student_id == student.id
+        )
+        .order_by(TopicDialogMessage.id.asc())
+        .all()
+    )
+
 
 def ask_question(db: Session, student: Student, topic_id: int, question_id: int) -> TopicDialogMessage:
     topic = get_student_topic_or_404(db, student, topic_id)
@@ -80,6 +89,29 @@ def ask_question(db: Session, student: Student, topic_id: int, question_id: int)
         student_id=student.id,
         question_id=cast(int, question.id),
         question_text=cast(str, question.text),
+        answer_text=answer
+    )
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+
+    return message
+
+def ask_custom_question(db: Session, student: Student, topic_id: int, question_text: str) -> TopicDialogMessage:
+    topic = get_student_topic_or_404(db, student, topic_id)
+
+    if not question_text:
+        raise HTTPException(status_code=400, detail="Вопрос не может быть пустым")
+
+    context = build_topic_context(topic)
+    prompt = build_prompt(topic.title, context, question_text)
+    answer = call_llm(prompt)
+
+    message = TopicDialogMessage(
+        topic_id=topic.id,
+        student_id=student.id,
+        question_id=None,  # Для своего вопроса нет question_id
+        question_text=question_text,
         answer_text=answer
     )
     db.add(message)

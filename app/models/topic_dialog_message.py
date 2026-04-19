@@ -9,7 +9,7 @@ class TopicDialogMessage(Base):
     id = Column(Integer, primary_key=True)
     topic_id = Column(Integer, ForeignKey('topics.id'), nullable=False)
     student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
-    question_id = Column(Integer, ForeignKey('topic_questions.id'), nullable=False)
+    question_id = Column(Integer, ForeignKey('topic_questions.id'), nullable=True)
     question_text = Column(Text, nullable=False)
     answer_text = Column(Text, nullable=False)
 

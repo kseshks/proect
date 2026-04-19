@@ -15,4 +15,4 @@ class TopicMaterial(Base):
     extracted_text = Column(Text, nullable=True)
     parse_status = Column(String, nullable=False, default="pending")
 
-    topic = relationship("Topic", back_populates="materials ")
+    topic = relationship("Topic", back_populates="materials")

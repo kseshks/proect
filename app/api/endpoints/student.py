@@ -32,3 +32,14 @@ def student_ask(
     student=Depends(require_student)
 ):
     return ask_question(db, student, topic_id, data.question_id)
+
+@router.post("/topics/{topic_id}/ask/custom")
+def student_ask_custom(
+    topic_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    student=Depends(require_student)
+):
+    """Отправка своего вопроса (не из списка)"""
+    from app.services.student_service import ask_custom_question
+    return ask_custom_question(db, student, topic_id, data.get("question_text", ""))

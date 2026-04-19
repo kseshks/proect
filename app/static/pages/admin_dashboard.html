@@ -3,250 +3,641 @@
 <head>
     <meta charset="UTF-8">
     <title>Администратор</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/components/buttons.css">
-    <link rel="stylesheet" href="../css/components/cards.css">
-    <link rel="stylesheet" href="../css/components/forms.css">
-    <link rel="stylesheet" href="../css/components/navigations.css">
-    <link rel="stylesheet" href="../css/components/tables.css">
-    <link rel="stylesheet" href="../css/pages/admin_dashboard.css">
+    <link rel="stylesheet" href="admin_dashboard.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="navbar">
-            <button class="nav-btn active" data-tab="students">Ученики</button>
-            <button class="nav-btn" data-tab="teachers">Учителя</button>
-            <button class="logout-nav-btn" type="button" onclick="logout()">Выйти</button>
-        </div>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <button class="tab-btn active" data-tab="students">Ученики</button>
+            <button class="tab-btn" data-tab="teachers">Учителя</button>
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+        </aside>
 
-        <!-- Ученики -->
-        <div class="section active" id="students-section">
-            <h2>Ученики</h2>
-            <div class="action-buttons">
-                <button class="action-btn" type="button" onclick="openAddStudentModal()">+ Добавить</button>
-                <button class="action-btn download-btn" type="button" id="downloadBtn">📥 Скачать последние данные</button>
+        <main class="main-content">
+            <!-- ПАНЕЛЬ УЧЕНИКОВ (КЛАССЫ) -->
+            <div class="tab-panel active" id="students-panel">
+                <div class="list-container">
+                    <div class="scrollbar-visual"></div>
+                    <div class="cards-wrapper" id="classes-list"></div>
+                </div>
+                <button class="add-btn" onclick="openAddClassModal()">Добавить класс</button>
             </div>
-            <div class="list-container" id="studentsList"></div>
-        </div>
 
-        <!-- Учителя -->
-        <div class="section" id="teachers-section">
-            <h2>Учителя</h2>
-            <div class="action-buttons">
-                <button class="action-btn" type="button" onclick="openAddTeacherModal()">+ Добавить учителя</button>
+            <!-- ПАНЕЛЬ УЧИТЕЛЕЙ -->
+            <div class="tab-panel" id="teachers-panel">
+                <div class="list-container">
+                    <div class="scrollbar-visual"></div>
+                    <div class="cards-wrapper" id="teachers-list"></div>
+                </div>
+                <button class="add-btn" onclick="generateTeacherCredentials()">Добавить учителя</button>
             </div>
-            <div class="list-container" id="teachersList"></div>
-        </div>
+
+            <div class="footer">Made by Vie</div>
+        </main>
     </div>
 
-    <!-- Модалка учеников -->
-    <div id="studentModal" class="modal">
+    <!-- ==================== МОДАЛЬНЫЕ ОКНА ==================== -->
+
+    <!-- МОДАЛЬНОЕ ОКНО: Информация о классе (список учеников) -->
+    <div class="modal-overlay" id="class-info-modal">
         <div class="modal-content">
-            <h3>Добавить учеников</h3>
-            <input type="text" id="studentClassName" placeholder="Название класса">
-            <input type="number" id="studentCount" placeholder="Количество">
-            <button type="button" onclick="addStudents()">Подтвердить</button>
-            <button type="button" onclick="closeModal('studentModal')">Назад</button>
+            <div class="class-header" id="class-info-header">Класс</div>
+            <div class="students-list-container">
+                <div class="scrollbar-visual"></div>
+                <div class="students-cards-wrapper" id="students-in-class"></div>
+            </div>
+            <button class="add-btn" onclick="openAddStudentsBatchModal()">Добавить ученика</button>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('class-info-modal')">Назад</button>
+                <button class="nav-btn" onclick="downloadClassList()">Скачать</button>
+            </div>
         </div>
     </div>
 
-    <!-- Модалка учителей -->
-    <div id="teacherModal" class="modal">
+    <!-- МОДАЛЬНОЕ ОКНО: Добавление класса -->
+    <div class="modal-overlay" id="add-class-modal">
         <div class="modal-content">
-            <h3>Добавить учителя</h3>
-            <input type="number" id="teacherCount" placeholder="Количество">
-            <button type="button" onclick="addTeacher()">Подтвердить</button>
-            <button type="button" onclick="closeModal('teacherModal')">Назад</button>
+            <div class="class-header">Новый класс</div>
+            
+            <div class="form-row" style="max-width: 500px; margin: 0 auto 24px;">
+                <input type="text" class="form-input" placeholder="Название класса" id="class-name-input">
+            </div>
+            
+            <!--  ВЫБОР УЧИТЕЛЯ -->
+            <div class="form-row" style="max-width: 500px; margin: 0 auto 24px;">
+                <select class="form-input" id="teacher-select" style="cursor: pointer;">
+                    <option value="">Без учителя</option>
+                </select>
+            </div>
+            
+            <div class="form-row" style="max-width: 500px; margin: 0 auto 40px;">
+                <input type="number" class="form-input" placeholder="Количество учеников" id="students-count" min="0" max="50" value="0">
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('add-class-modal')">Назад</button>
+                <button class="nav-btn" onclick="confirmAddClass()">Подтвердить</button>
+            </div>
         </div>
     </div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
-    <script src="/static/js/admin.js"></script>
+    <!-- МОДАЛЬНОЕ ОКНО: Добавление учеников в существующий класс -->
+    <div class="modal-overlay" id="add-students-batch-modal">
+        <div class="modal-content">
+            <div class="class-header" id="add-students-header">Добавить учеников</div>
+            <div class="form-row" style="max-width: 400px; margin: 0 auto 40px;">
+                <input type="number" class="form-input" placeholder="Количество учеников" id="add-students-count" min="1" max="50" value="1">
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('add-students-batch-modal')">Назад</button>
+                <button class="nav-btn" onclick="confirmAddStudentsBatch()">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: Данные созданного учителя -->
+    <div class="modal-overlay" id="teacher-created-modal">
+        <div class="teacher-created-card">
+            <h2 class="teacher-created-title">Учитель создан!</h2>
+            
+            <div class="teacher-created-subtitle">Данные для входа</div>
+            
+            <div class="teacher-credential-group">
+                <div class="teacher-credential-label">Логин</div>
+                <div class="teacher-credential-field" id="created-teacher-login">teacher_123456</div>
+            </div>
+            
+            <div class="teacher-credential-group">
+                <div class="teacher-credential-label">Пароль</div>
+                <div class="teacher-credential-field" id="created-teacher-password">********</div>
+            </div>
+            
+            <button class="teacher-copy-btn" onclick="copyTeacherCredentials()">Копировать</button>
+            
+            <div class="teacher-modal-buttons">
+                <button class="teacher-modal-btn" onclick="closeTeacherCreatedModal()">Закрыть</button>
+                <button class="teacher-modal-btn" onclick="downloadTeacherCredentials()">Скачать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: Данные созданных учеников -->
+    <div class="modal-overlay" id="students-created-modal">
+        <div class="students-created-card">
+            <h2 class="students-created-title">Ученики созданы!</h2>
+            
+            <div class="students-created-subtitle" id="students-created-count">5 учеников добавлено</div>
+            
+            <div class="students-list-container-modal" id="students-credentials-list">
+                <!-- Список учеников будет здесь -->
+            </div>
+            
+            <button class="students-copy-btn" onclick="copyAllStudentsCredentials()">Копировать все</button>
+            
+            <div class="students-modal-buttons">
+                <button class="students-modal-btn" onclick="closeStudentsCreatedModal()">Закрыть</button>
+                <button class="students-modal-btn" onclick="downloadClassList()">Скачать</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
     <script>
-        let lastGeneratedStudents = [];
+        // Глобальные переменные
+        let currentClassId = null;
 
-        async function renderStudents() {
+        // ==================== ИНИЦИАЛИЗАЦИЯ И НАВИГАЦИЯ ====================
+        
+        // Переключение вкладок
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                
+                // Обновляем активную кнопку
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Показываем нужную панель
+                document.querySelectorAll('.tab-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                document.getElementById(tab + '-panel').classList.add('active');
+                
+                // Обновляем данные при переключении
+                if (tab === 'students') {
+                    renderClasses();
+                } else if (tab === 'teachers') {
+                    renderTeachers();
+                }
+            });
+        });
+
+        // ==================== РЕНДЕРИНГ КЛАССОВ ====================
+        
+        async function renderClasses() {
             try {
-                const students = await loadAdminStudents();
-                const container = document.getElementById("studentsList");
-                container.innerHTML = "";
-
-                if (!students.length) {
-                    container.innerHTML = "<p>Учеников пока нет</p>";
+                const classes = await loadAdminClasses();
+                const container = document.getElementById('classes-list');
+                
+                if (!classes || classes.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; padding: 40px; font-size: 18px; opacity: 0.7;">Нет созданных классов</p>';
                     return;
                 }
 
-                students.forEach(student => {
-                    const item = document.createElement("div");
-                    item.className = "list-item";
-                    item.innerHTML = `
-                        <span>Ученик ${student.student_number}</span>
-                        <button type="button" onclick="removeStudent(${student.id})">Удалить</button>
-                    `;
-                    container.appendChild(item);
-                });
+                container.innerHTML = classes.map(cls => `
+                    <div class="card">
+                        <span class="card-title">${cls.name}</span>
+                        <div class="card-actions">
+                            <button class="btn" onclick="openClassInfo(${cls.id}, '${cls.name}')">Инфо</button>
+                            <button class="btn" onclick="deleteClass(${cls.id}, '${cls.name}')">Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
             } catch (error) {
-                alert(error.message);
+                console.error('Ошибка загрузки классов:', error);
+                alert('Не удалось загрузить классы: ' + error.message);
             }
         }
 
+        // ==================== РЕНДЕРИНГ УЧИТЕЛЕЙ ====================
+        
         async function renderTeachers() {
             try {
                 const teachers = await loadAdminTeachers();
-                const container = document.getElementById("teachersList");
-                container.innerHTML = "";
-
-                if (!teachers.length) {
-                    container.innerHTML = "<p>Учителей пока нет</p>";
+                const container = document.getElementById('teachers-list');
+                
+                if (!teachers || teachers.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; padding: 40px; font-size: 18px; opacity: 0.7;">Нет зарегистрированных учителей</p>';
                     return;
                 }
 
-                teachers.forEach(teacher => {
-                    const item = document.createElement("div");
-                    item.className = "list-item";
-                    item.innerHTML = `
-                        <span>Учитель ${teacher.login}</span>
-                        <button type="button" onclick="removeTeacher(${teacher.id})">Удалить</button>
-                    `;
-                    container.appendChild(item);
-                });
+                container.innerHTML = teachers.map(teacher => `
+                    <div class="card">
+                        <span class="card-title">${teacher.login}</span>
+                        <div class="card-actions">
+                            <button class="btn" onclick="deleteTeacher(${teacher.id}, '${teacher.login}')">Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
             } catch (error) {
-                alert(error.message);
+                console.error('Ошибка загрузки учителей:', error);
+                alert('Не удалось загрузить учителей: ' + error.message);
             }
         }
 
-        async function renderAll() {
-            await renderStudents();
-            await renderTeachers();
-        }
-
-        async function addStudents() {
-            const className = document.getElementById("studentClassName").value.trim();
-            const count = Number(document.getElementById("studentCount").value);
-
-            if (!className) {
-                alert("Введите название класса");
-                return;
-            }
-
-            if (!count || count < 1) {
-                alert("Введите корректное количество");
-                return;
-            }
-
-            try {
-                const result = await generateAdminStudents(className, count);
-                lastGeneratedStudents = result.students || [];
-
-                alert("Ученики успешно созданы");
-                closeModal("studentModal");
-                document.getElementById("studentClassName").value = "";
-                document.getElementById("studentCount").value = "";
-
-                await renderStudents();
-            } catch (error) {
-                alert(error.message);
+        // ==================== РАБОТА С МОДАЛЬНЫМИ ОКНАМИ ====================
+        
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
         }
 
-        async function addTeacher() {
-            const count = Number(document.getElementById("teacherCount").value);
-
-            if (!count || count < 1) {
-                alert("Введите корректное количество");
-                return;
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
             }
-
-            try {
-                await generateAdminTeachers(count);
-                alert("Учителя успешно созданы");
-
-                closeModal("teacherModal");
-                document.getElementById("teacherCount").value = "";
-
-                await renderTeachers();
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        async function removeStudent(studentId) {
-            if (!confirm("Удалить ученика?")) {
-                return;
-            }
-
-            try {
-                await deleteAdminStudent(studentId);
-                await renderStudents();
-            } catch (error) {
-                alert(error.message);
+            
+            // Очищаем поля ввода
+            if (modalId === 'add-class-modal') {
+                document.getElementById('class-name-input').value = '';
+                document.getElementById('students-count').value = '0';
+            } else if (modalId === 'add-teacher-modal') {
+                // Очищаем поля учителя
+                generatedTeacherLogin = '';
+                generatedTeacherPassword = '';
+                document.getElementById('generated-teacher-login').value = '';
+                document.getElementById('generated-teacher-password').value = '';
+            } else if (modalId === 'add-students-batch-modal') {
+                document.getElementById('add-students-count').value = '1';
             }
         }
 
-        async function removeTeacher(teacherId) {
-            if (!confirm("Удалить учителя?")) {
-                return;
-            }
-
-            try {
-                await deleteAdminTeacher(teacherId);
-                await renderTeachers();
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        function openModal(id) {
-            document.getElementById(id).style.display = "flex";
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = "none";
-        }
-
-        function openAddStudentModal() {
-            openModal("studentModal");
-        }
-
-        function openAddTeacherModal() {
-            openModal("teacherModal");
-        }
-
-        document.getElementById("downloadBtn").onclick = () => {
-            if (!lastGeneratedStudents.length) {
-                alert("Сначала сгенерируйте учеников");
-                return;
-            }
-
-            const text = lastGeneratedStudents
-                .map((student, index) => `${index + 1}. ID: ${student.student_number} | Пароль: ${student.password}`)
-                .join("\n");
-
-            const blob = new Blob([text], { type: "text/plain" });
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = "students_credentials.txt";
-            a.click();
-        };
-
-        document.querySelectorAll(".nav-btn").forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll(".section").forEach(section => {
-                    section.classList.remove("active");
-                });
-
-                document.getElementById(btn.dataset.tab + "-section").classList.add("active");
-
-                document.querySelectorAll(".nav-btn").forEach(button => {
-                    button.classList.remove("active");
-                });
-
-                btn.classList.add("active");
-            };
+        // Закрытие модального окна при клике на фон
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
         });
 
-        renderAll();
+        function openAddTeacherModal() {
+            openModal('add-teacher-modal');
+        }
+
+        // ==================== ДОБАВЛЕНИЕ КЛАССА ====================
+        
+        // Глобальная переменная для списка учителей
+        let teachersList = [];
+
+        // ==================== ЗАГРУЗКА УЧИТЕЛЕЙ ДЛЯ ВЫБОРА ====================
+        async function loadTeachersForSelect() {
+            try {
+                teachersList = await loadAdminTeachers();
+                const select = document.getElementById('teacher-select');
+                
+                select.innerHTML = '<option value="">Без учителя</option>';
+                
+                teachersList.forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher.id;
+                    option.textContent = teacher.login;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки учителей:', error);
+            }
+        }
+
+        // ==================== ОТКРЫТИЕ МОДАЛКИ КЛАССА ====================
+        function openAddClassModal() {
+            document.getElementById('class-name-input').value = '';
+            document.getElementById('students-count').value = '0';
+            document.getElementById('teacher-select').value = '';
+            loadTeachersForSelect();  // ✅ Загружаем список учителей
+            openModal('add-class-modal');
+        }
+
+        // ==================== ДОБАВЛЕНИЕ КЛАССА ====================
+        async function confirmAddClass() {
+            const className = document.getElementById('class-name-input').value.trim();
+            const studentsCount = parseInt(document.getElementById('students-count').value) || 0;
+            const teacherId = document.getElementById('teacher-select').value || null;
+
+            if (!className) {
+                alert('Введите название класса');
+                return;
+            }
+
+            try {
+                // ✅ Передаем teacherId
+                const newClass = await createAdminClass(className, teacherId ? parseInt(teacherId) : null);
+                
+                if (studentsCount > 0) {
+                    const result = await generateAdminStudents(className, studentsCount);
+                    const students = result.students || [];
+                    showStudentsCreatedModal(students, className, studentsCount);
+                } else {
+                    alert(`Класс "${className}" успешно создан`);
+                }
+                
+                closeModal('add-class-modal');
+                await renderClasses();
+            } catch (error) {
+                console.error('Ошибка создания класса:', error);
+                alert('Ошибка создания класса: ' + error.message);
+            }
+        }
+
+        
+        // Глобальные переменные для хранения данных созданного учителя
+        let lastCreatedTeacher = { login: '', password: '' };
+
+        async function generateTeacherCredentials() {
+            try {
+                const result = await generateAdminTeachers(1);
+                console.log('Учитель создан:', result);
+                
+                let login, password;
+                if (result.teachers) {
+                    login = result.teachers[0].login;
+                    password = result.teachers[0].password;
+                } else if (Array.isArray(result)) {
+                    login = result[0].login;
+                    password = result[0].password;
+                }
+                
+                if (login && password) {
+                    // Сохраняем данные
+                    lastCreatedTeacher = { login, password };
+                    
+                    // Заполняем модальное окно
+                    document.getElementById('created-teacher-login').textContent = login;
+                    document.getElementById('created-teacher-password').textContent = password;
+                    
+                    // Открываем красивое модальное окно
+                    openModal('teacher-created-modal');
+                } else {
+                    alert('Учитель успешно создан!');
+                }
+                
+                await renderTeachers();
+            } catch (error) {
+                console.error('Ошибка создания учителя:', error);
+                alert('Ошибка создания учителя: ' + error.message);
+            }
+        }
+
+        // Закрыть модальное окно
+        function closeTeacherCreatedModal() {
+            closeModal('teacher-created-modal');
+            lastCreatedTeacher = { login: '', password: '' };
+        }
+
+        // Копировать данные
+        function copyTeacherCredentials() {
+            const text = `Логин: ${lastCreatedTeacher.login}\nПароль: ${lastCreatedTeacher.password}`;
+            navigator.clipboard.writeText(text).then(() => {
+                // Показать уведомление об успехе
+                const notification = document.createElement('div');
+                notification.className = 'copy-success';
+                notification.textContent = 'Данные скопированы!';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            });
+        }
+
+        // Скачать данные
+        function downloadTeacherCredentials() {
+            const text = `Логин: ${lastCreatedTeacher.login}\nПароль: ${lastCreatedTeacher.password}`;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `teacher_${lastCreatedTeacher.login}_credentials.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // ==================== ИНФОРМАЦИЯ О КЛАССЕ ====================
+        
+        async function openClassInfo(classId, className) {
+            currentClassId = classId;
+            currentClassName = className;
+            
+            document.getElementById('class-info-header').textContent = className;
+            document.getElementById('add-students-header').textContent = `Класс: ${className}`;
+            
+            try {
+                const students = await loadAdminClassStudents(classId);
+                const container = document.getElementById('students-in-class');
+                
+                if (!students || students.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; padding: 40px; font-size: 18px; opacity: 0.7;">В классе нет учеников</p>';
+                } else {
+                    container.innerHTML = students.map(student => `
+                        <div class="student-card">
+                            <div class="student-info">
+                                <span class="student-field">Логин: ${student.student_number}</span>
+                            </div>
+                            <button class="delete-small-btn" onclick="deleteStudentFromClass(${student.id})">Удалить</button>
+                        </div>
+                    `).join('');
+                    
+                    lastGeneratedStudents = students;
+                }
+                
+                openModal('class-info-modal');
+            } catch (error) {
+                console.error('Ошибка загрузки учеников:', error);
+                alert('Не удалось загрузить учеников класса: ' + error.message);
+            }
+        }
+
+        // ==================== УДАЛЕНИЕ ====================
+        
+        async function deleteClass(classId, className) {
+            if (!confirm(`Вы уверены, что хотите удалить класс "${className}"? Все ученики класса будут удалены.`)) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://127.0.0.1:8000/admin/classes/${classId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления');
+                }
+                
+                await renderClasses();
+            } catch (error) {
+                console.error('Ошибка удаления класса:', error);
+                alert('Не удалось удалить класс');
+            }
+        }
+
+        async function deleteTeacher(teacherId, login) {
+            if (!confirm(`Вы уверены, что хотите удалить учителя "${login}"?`)) {
+                return;
+            }
+            
+            try {
+                // Используем fetch напрямую, без ожидания JSON
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://127.0.0.1:8000/admin/teachers/${teacherId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления');
+                }
+                
+                // Успешно удален
+                await renderTeachers();
+            } catch (error) {
+                console.error('Ошибка удаления учителя:', error);
+                alert('Не удалось удалить учителя');
+            }
+        }
+
+        async function deleteStudentFromClass(studentId) {
+            if (!confirm('Удалить этого ученика?')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://127.0.0.1:8000/admin/students/${studentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления');
+                }
+                
+                // ✅ Успешно удален - обновляем список
+                if (currentClassId) {
+                    await openClassInfo(currentClassId, currentClassName);
+                }
+            } catch (error) {
+                console.error('Ошибка удаления ученика:', error);
+                alert('Не удалось удалить ученика');
+            }
+        }
+
+        // ==================== ДОБАВЛЕНИЕ УЧЕНИКОВ В КЛАСС ====================
+        
+        function openAddStudentsBatchModal() {
+            if (!currentClassId) {
+                alert('Класс не выбран');
+                return;
+            }
+            openModal('add-students-batch-modal');
+        }
+
+        async function confirmAddStudentsBatch() {
+            const count = parseInt(document.getElementById('add-students-count').value);
+            
+            if (!count || count < 1 || count > 50) {
+                alert('Введите количество от 1 до 50');
+                return;
+            }
+            
+            if (!currentClassName) {
+                alert('Класс не выбран');
+                return;
+            }
+            
+            try {
+                const result = await generateAdminStudents(currentClassName, count);
+                const students = result.students || [];
+                
+                // ✅ Показываем красивое модальное окно
+                showStudentsCreatedModal(students, currentClassName, count);
+                
+                closeModal('add-students-batch-modal');
+                
+                // Обновляем список учеников в окне класса
+                if (currentClassId) {
+                    await openClassInfo(currentClassId, currentClassName);
+                }
+            } catch (error) {
+                console.error('Ошибка добавления учеников:', error);
+                alert('Не удалось добавить учеников: ' + error.message);
+            }
+        }
+
+        let lastGeneratedStudents = [];
+        let currentClassName = '';
+
+        // ==================== ФУНКЦИИ ДЛЯ МОДАЛЬНОГО ОКНА УЧЕНИКОВ ====================
+
+        function showStudentsCreatedModal(students, className, count) {
+            currentClassName = className;
+            lastGeneratedStudents = students;
+            
+            // Заголовок
+            document.getElementById('students-created-count').textContent = `${count} учеников добавлено в класс "${className}"`;
+            
+            // Список учеников
+            const container = document.getElementById('students-credentials-list');
+            container.innerHTML = students.map(s => `
+                <div class="student-credential-item">
+                    <span class="student-credential-login">${s.student_number}</span>
+                    <span class="student-credential-password">${s.password}</span>
+                </div>
+            `).join('');
+            
+            openModal('students-created-modal');
+        }
+
+        function closeStudentsCreatedModal() {
+            closeModal('students-created-modal');
+        }
+
+        function copyAllStudentsCredentials() {
+            if (!lastGeneratedStudents || lastGeneratedStudents.length === 0) {
+                alert('Нет данных для копирования');
+                return;
+            }
+            
+            const text = lastGeneratedStudents
+                .map(s => `Логин: ${s.student_number} | Пароль: ${s.password}`)
+                .join('\n');
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const notification = document.createElement('div');
+                notification.className = 'copy-success';
+                notification.textContent = 'Данные всех учеников скопированы!';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            }).catch(() => {
+                alert('Не удалось скопировать. Скопируйте вручную.');
+            });
+        }
+
+        // ==================== СКАЧИВАНИЕ ДАННЫХ ====================
+        
+        function downloadClassList() {
+            if (!lastGeneratedStudents || lastGeneratedStudents.length === 0) {
+                alert('Нет данных для скачивания');
+                return;
+            }
+            
+            const text = lastGeneratedStudents
+                .map((student, index) => `${index + 1}. Логин: ${student.student_number} | Пароль: ${student.password || 'не указан'}`)
+                .join('\n');
+                
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `students_${currentClassName}_credentials.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        
+        // Загружаем данные при старте
+        renderClasses();
     </script>
 </body>
 </html>

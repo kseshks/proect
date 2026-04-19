@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --bg-color: #A7AADB;
+    --primary: #13164B;
+    --white: #FFFFFF;
+    --btn-bg: #DDE8FB;
+    --radius-lg: 30px;
+    --radius-md: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--primary);
+    min-height: 100vh;
+    padding: 30px 40px;
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.dialog-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+}
+
+/* Заголовок */
+.dialog-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.dialog-title {
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.dialog-subtitle {
+    font-size: 18px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+/* Основной контент */
+.dialog-main {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 25px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Панель вопросов */
+.questions-panel {
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.panel-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.questions-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.questions-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.questions-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.questions-list::-webkit-scrollbar-thumb {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+}
+
+.question-btn {
+    width: 100%;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.question-btn:hover {
+    background: #c8d8f5;
+}
+
+.question-btn:last-child {
+    margin-bottom: 0;
+}
+
+/* Панель чата */
+.chat-panel {
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 20px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+}
+
+/* Сообщение в чате */
+.chat-message {
+    margin-bottom: 20px;
+    padding: 18px;
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+}
+
+.message-question {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--primary);
+}
+
+.message-answer {
+    /* стили для ответа */
+}
+
+.message-label {
+    font-weight: 600;
+    color: var(--primary);
+    margin-right: 8px;
+}
+
+.message-text {
+    color: var(--primary);
+    line-height: 1.5;
+}
+
+/* Поле ввода */
+.chat-input-section {
+    border-top: 2px solid var(--primary);
+    padding-top: 20px;
+}
+
+.chat-input-wrapper {
+    display: flex;
+    gap: 12px;
+}
+
+.chat-input {
+    flex: 1;
+    height: 56px;
+    padding: 0 24px;
+    background: var(--bg-color);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    color: var(--primary);
+    outline: none;
+}
+
+.chat-input::placeholder {
+    color: var(--primary);
+    opacity: 0.6;
+}
+
+.chat-input:focus {
+    border-width: 3px;
+    background: #b8bbe8;
+}
+
+.chat-send-btn {
+    width: 160px;
+    height: 56px;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chat-send-btn:hover {
+    background: var(--btn-bg);
+}
+
+/* Кнопка назад */
+.dialog-footer {
+    margin-top: 30px;
+}
+
+.back-btn {
+    width: 200px;
+    height: 56px;
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: var(--btn-bg);
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 16px;
+    color: var(--primary);
+    opacity: 0.6;
+}
+
+/* Footer */
+.footer {
+    position: fixed;
+    bottom: 24px;
+    right: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+    opacity: 0.8;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
+    body {
+        padding: 20px;
+    }
+
+    .dialog-main {
+        grid-template-columns: 1fr;
+    }
+
+    .dialog-title {
+        font-size: 32px;
+    }
+
+    .chat-input-wrapper {
+        flex-direction: column;
+    }
+
+    .chat-send-btn {
+        width: 100%;
+    }
+
+    .footer {
+        position: static;
+        margin-top: 30px;
+        text-align: right;
+    }
+}

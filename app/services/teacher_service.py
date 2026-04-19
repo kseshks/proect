@@ -397,3 +397,27 @@ def assign_topic(db: Session, teacher, topic_id: int, class_ids: list[int], stud
         "assigned_count": created,
         "selected_students_count": len(student_ids)
     }
+
+def get_topic_assignments(db: Session, teacher_id: int, topic_id: int) -> dict:
+    """Возвращает классы и учеников, которым уже назначена тема"""
+    topic = get_teacher_topic_or_404(db, teacher_id, topic_id)
+    
+    # Получаем все назначения этой темы
+    assignments = db.query(TopicAssignment).filter(
+        TopicAssignment.topic_id == topic_id
+    ).all()
+    
+    assigned_class_ids = set()
+    assigned_student_numbers = set()
+    
+    for assignment in assignments:
+        student = assignment.student
+        assigned_student_numbers.add(student.student_number)
+        if student.class_id:
+            assigned_class_ids.add(student.class_id)
+    
+    return {
+        "topic_id": topic_id,
+        "assigned_class_ids": list(assigned_class_ids),
+        "assigned_student_numbers": list(assigned_student_numbers)
+    }

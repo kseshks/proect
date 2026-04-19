@@ -96,13 +96,14 @@ def get_classroom_by_id(db: Session, class_id: int) -> ClassRoom:
     return classroom
 
 
-def delete_classroom(db: Session, class_id: int) -> None:
+def delete_classroom(db: Session, class_id: int) -> dict:
     classroom = get_classroom_by_id(db, class_id)
     db.delete(classroom)
     db.commit()
+    return {"message": "Класс успешно удален", "id": class_id}
 
 
-def delete_student(db: Session, student_id: int) -> None:
+def delete_student(db: Session, student_id: int) -> dict:
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(
@@ -111,9 +112,10 @@ def delete_student(db: Session, student_id: int) -> None:
         )
     db.delete(student)
     db.commit()
+    return {"message": "Ученик успешно удален", "id": student_id}
 
 
-def delete_teacher(db: Session, teacher_id: int) -> None:
+def delete_teacher(db: Session, teacher_id: int) -> dict:
     teacher = db.query(Teacher).filter(Teacher.id == teacher_id).first()
     if not teacher:
         raise HTTPException(
@@ -122,3 +124,4 @@ def delete_teacher(db: Session, teacher_id: int) -> None:
         )
     db.delete(teacher)
     db.commit()
+    return {"message": "Учитель успешно удален", "id": teacher_id}

@@ -4,40 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход ученика</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/components/buttons.css">
-    <link rel="stylesheet" href="../css/components/forms.css">
-    <link rel="stylesheet" href="../css/components/cards.css">
-    <link rel="stylesheet" href="../css/pages/login.css">
+    <link rel="stylesheet" href="student_login.css">
 </head>
 <body>
-    <div class="container">
-        <div class="login-card">
-            <h2>Окно входа ученика</h2>
-
-            <div class="role-switch">
-                <button class="role-btn" type="button" onclick="window.location.href='admin_login.html'">
-                    Войти как администратор
-                </button>
-                <button class="role-btn" type="button" onclick="window.location.href='teacher_login.html'">
-                    Войти как учитель
-                </button>
+    <div class="login-card">
+        <h1 class="title">Ученик</h1>
+        
+        <form id="student-login-form">
+            <div class="input-group">
+                <div class="input-label">Введите ID</div>
+                <input id="student-id" type="text" class="input-field" placeholder="ID">
             </div>
-
-            <form id="student-login-form">
-                <input id="student-id" type="text" placeholder="Введите ID ученика" />
-                <input id="student-password" type="password" placeholder="Введите пароль" />
-                <button type="submit">Войти</button>
-            </form>
-
-            <div class="footer">
-                <p>Made by Vie</p>
+            
+            <div class="input-group">
+                <div class="input-label">Введите пароль</div>
+                <input id="student-password" type="password" class="input-field" placeholder="Пароль">
             </div>
-        </div>
+            
+            <button type="submit" class="login-btn">Войти</button>
+        </form>
+    </div>
+    
+    <div class="footer">
+        <p>Made by Vie</p>
     </div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
     <script>
         const form = document.getElementById("student-login-form");
 
@@ -55,7 +48,7 @@
                     return;
                 }
 
-                window.location.href = "/static/pages/student_dashboard.html";
+                window.location.href = "../pages/student_dashboard.html";
             } catch (error) {
                 alert(error.message);
             }

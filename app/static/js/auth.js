@@ -2,8 +2,8 @@ async function login(identifier, password) {
     const data = await apiRequest("/auth/login", {
         method: "POST",
         body: JSON.stringify({
-            identifier,
-            password
+            username: identifier,
+            password: password
         })
     });
 
@@ -15,5 +15,5 @@ async function login(identifier, password) {
 
 function logout() {
     clearAuth();
-    window.location.href = "/static/pages/admin_login.html";
+    window.location.href = "../index.html";
 }

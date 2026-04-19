@@ -1,0 +1,175 @@
+/* ==================== СТРАНИЦА ТЕМЫ ==================== */
+.topic-header {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.topic-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.topic-description {
+    font-size: 18px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+.topic-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.topic-section {
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.section-header h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.material-add-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed var(--primary);
+}
+
+.materials-list,
+.questions-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.list-item-card {
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary);
+    word-break: break-word;
+    flex: 1;
+    padding-right: 15px;
+}
+
+.topic-assign-section {
+    width: 100%;
+    background: var(--white);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    margin-top: 10px;
+}
+
+.assign-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.assign-column {
+    background: var(--btn-bg);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.assign-column-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.assign-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.assign-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.assign-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(19, 22, 75, 0.1);
+}
+
+.assign-item.selected {
+    background: var(--primary);
+    border-color: var(--white);
+}
+
+.assign-item.selected .assign-text {
+    color: var(--white);
+}
+
+.assign-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    accent-color: var(--primary);
+}
+
+.assign-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary);
+    flex: 1;
+}
+
+/* Стили для кнопки Назад в сайдбаре */
+.sidebar .tab-btn:first-child {
+    margin-top: 40px;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
+    .topic-two-columns,
+    .assign-two-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        padding: 30px 20px !important;
+    }
+}

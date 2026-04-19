@@ -23,7 +23,8 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     user_type = payload.get("user_type")
 
     if user_type == settings.ROLE_ADMIN:
-        user = db.query(Admin).filter(Admin.id == user_id).first()
+        username = payload.get("sub")
+        user = db.query(Admin).filter(Admin.login == username).first()
     elif user_type == settings.ROLE_TEACHER:
         user = db.query(Teacher).filter(Teacher.id == user_id).first()
     elif user_type == settings.ROLE_STUDENT:

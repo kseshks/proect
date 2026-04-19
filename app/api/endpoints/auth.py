@@ -9,4 +9,4 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=Token)
 def login_endpoint(login_data: LoginRequest, db: Session = Depends(get_db)):
-    return login(db, login_data.identifier, login_data.password)
+    return login(db, login_data.username, login_data.password)

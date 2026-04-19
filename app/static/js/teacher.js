@@ -110,3 +110,26 @@ async function loadTeacherRatingsByClass(classId) {
 async function loadTeacherOverallRatings() {
     return apiRequest("/teacher/ratings/overall");
 }
+
+// Загрузка материалов темы
+async function loadTeacherTopicMaterials(topicId) {
+    return apiRequest(`/teacher/topics/${topicId}/materials`);
+}
+
+// Удаление материала
+async function deleteTeacherMaterial(materialId) {
+    return apiRequest(`/teacher/materials/${materialId}`, {
+        method: "DELETE"
+    });
+}
+
+// Удаление вопроса
+async function deleteTeacherQuestion(questionId) {
+    return apiRequest(`/teacher/questions/${questionId}`, {
+        method: "DELETE"
+    });
+}
+
+async function loadTopicAssignments(topicId) {
+    return apiRequest(`/teacher/topics/${topicId}/assignments`);
+}

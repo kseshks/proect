@@ -4,276 +4,880 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Учитель - Панель управления</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/components/navigation.css">
-    <link rel="stylesheet" href="../css/components/buttons.css">
-    <link rel="stylesheet" href="../css/components/cards.css">
-    <link rel="stylesheet" href="../css/pages/teacher_dashboard.css">
+    <link rel="stylesheet" href="teacher_dashboard.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <nav class="navbar">
-            <div class="nav-buttons">
-                <button class="nav-btn active" id="ratingBtn" type="button" onclick="showSection('rating')">Рейтинг</button>
-                <button class="nav-btn" id="themesBtn" type="button" onclick="showSection('themes')">Темы</button>
-                <button class="nav-btn" id="classesBtn" type="button" onclick="showSection('classes')">Классы</button>
-            </div>
-            <button class="logout-btn" type="button" onclick="logout()">Выйти</button>
-        </nav>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <button class="tab-btn active" data-tab="classes">Классы</button>
+            <button class="tab-btn" data-tab="rating">Рейтинг</button>
+            <button class="tab-btn" data-tab="themes">Темы и тесты</button>
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+        </aside>
 
-        <!-- Рейтинг -->
-        <div id="ratingSection" class="section active">
-            <div class="themes-header">
-                <h2>Рейтинг учеников</h2>
+        <main class="main-content">
+            <!-- Классы -->
+            <div class="tab-panel" id="classes-panel">
+                <div class="list-container">
+                    <div class="scrollbar-visual"></div>
+                    <div class="cards-wrapper" id="classes-list"></div>
+                </div>
+                <button class="add-btn" onclick="openAddClassModal()">Добавить класс</button>
             </div>
-            <div id="ratingList" class="list-container">
-                <p>Загрузка...</p>
-            </div>
-        </div>
 
-        <!-- Темы -->
-        <div id="themesSection" class="section">
-            <div class="themes-header">
-                <h2>Темы</h2>
-                <button class="add-theme-btn" type="button" onclick="openThemeModal()">+ Создать тему</button>
+            <!-- Рейтинг -->
+            <div class="tab-panel active" id="rating-panel">
+                <div class="list-container">
+                    <div class="scrollbar-visual"></div>
+                    <div class="cards-wrapper" id="rating-list">
+                        <p class="empty-state">Загрузка...</p>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="loadOverallRating()">Посмотреть общий рейтинг</button>
             </div>
-            <div class="themes-grid" id="themesGrid"></div>
-        </div>
 
-        <!-- Классы -->
-        <div id="classesSection" class="section">
-            <div class="themes-header">
-                <h2>Классы</h2>
-                <button class="add-theme-btn" type="button" onclick="openClassModal()">+ Добавить класс</button>
+            <!-- Темы -->
+            <div class="tab-panel" id="themes-panel">
+                <div class="list-container">
+                    <div class="scrollbar-visual"></div>
+                    <div class="cards-wrapper" id="themes-list"></div>
+                </div>
+                <button class="add-btn" onclick="openThemeModal()">Загрузить тему</button>
             </div>
-            <div class="themes-grid" id="classesGrid"></div>
-        </div>
 
-        <div class="footer">
-            <p>Made by Vie</p>
-        </div>
+            <div class="footer">
+                <p>Made by Vie</p>
+            </div>
+        </main>
     </div>
 
     <!-- Модалка темы -->
-    <div id="themeModal" class="modal" style="display:none;">
+    <div class="modal-overlay" id="theme-modal">
         <div class="modal-content">
-            <h3>Создать тему</h3>
-            <input type="text" id="themeTitle" placeholder="Название темы">
-            <textarea id="themeDescription" placeholder="Описание темы"></textarea>
-            <button type="button" onclick="createTheme()">Подтвердить</button>
-            <button type="button" onclick="closeModal('themeModal')">Назад</button>
+            <div class="class-header">Новая тема</div>
+            <div class="form-row" style="max-width: 500px; margin: 0 auto 24px;">
+                <input type="text" class="form-input" placeholder="Название темы" id="theme-title">
+            </div>
+            <div class="form-row" style="max-width: 500px; height: auto; margin: 0 auto 40px;">
+                <textarea class="form-input" placeholder="Описание темы" id="theme-description" style="height: 120px;"></textarea>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('theme-modal')">Назад</button>
+                <button class="nav-btn" onclick="createTheme()">Подтвердить</button>
+            </div>
         </div>
     </div>
 
-    <!-- Модалка класса -->
-    <div id="classModal" class="modal" style="display:none;">
+    <!-- Модалка добавления класса -->
+    <div class="modal-overlay" id="add-class-modal">
         <div class="modal-content">
-            <h3>Добавить класс</h3>
-            <input type="text" id="className" placeholder="Название класса">
-            <button type="button" onclick="createClass()">Подтвердить</button>
-            <button type="button" onclick="closeModal('classModal')">Назад</button>
+            <div class="class-header">Новый класс</div>
+            <div class="form-row" style="max-width: 500px; margin: 0 auto 24px;">
+                <input type="text" class="form-input" placeholder="Название класса" id="class-name-input">
+            </div>
+            <div class="form-row" style="max-width: 500px; margin: 0 auto 40px;">
+                <input type="number" class="form-input" placeholder="Количество учеников" id="students-count" min="0" max="50" value="0">
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('add-class-modal')">Назад</button>
+                <button class="nav-btn" onclick="confirmAddClass()">Подтвердить</button>
+            </div>
         </div>
     </div>
 
-    <script src="/static/js/api.js"></script>
-    <script src="/static/js/auth.js"></script>
-    <script src="/static/js/teacher.js"></script>
+    <!-- Модалка: Информация о классе -->
+    <div class="modal-overlay" id="class-info-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="class-header" id="class-info-header">Класс</div>
+            <div class="students-list-container">
+                <div class="students-cards-wrapper" id="students-in-class"></div>
+            </div>
+            <button class="add-btn" style="width: auto; padding: 0 40px; margin-top: 20px;" onclick="openAddStudentsBatchModal()">Добавить учеников</button>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('class-info-modal')">Назад</button>
+                <button class="nav-btn" onclick="downloadClassList()">Скачать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: Добавление учеников -->
+    <div class="modal-overlay" id="add-students-batch-modal">
+        <div class="modal-content">
+            <div class="class-header" id="add-students-header">Добавить учеников</div>
+            <div class="form-row" style="max-width: 400px; margin: 0 auto 40px;">
+                <input type="number" class="form-input" placeholder="Количество учеников" id="add-students-count" min="1" max="50" value="1">
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="closeModal('add-students-batch-modal')">Назад</button>
+                <button class="nav-btn" onclick="confirmAddStudentsBatch()">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: Созданные ученики -->
+    <div class="modal-overlay" id="students-created-modal">
+        <div class="students-created-card">
+            <h2 class="students-created-title">Ученики созданы!</h2>
+            <div class="students-created-subtitle" id="students-created-count">5 учеников добавлено</div>
+            <div class="students-list-container-modal" id="students-credentials-list"></div>
+            <button class="students-copy-btn" onclick="copyAllStudentsCredentials()">Копировать все</button>
+            <div class="students-modal-buttons">
+                <button class="students-modal-btn" onclick="closeStudentsCreatedModal()">Закрыть</button>
+                <button class="students-modal-btn" onclick="downloadClassList()">Скачать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: Информация о теме (материалы, вопросы, назначение) -->
+    <div class="modal-overlay" id="topic-info-modal">
+        <div class="modal-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">
+            <div class="topic-modal-header">
+                <h2 class="topic-modal-title" id="modal-topic-title">Тема</h2>
+                <p class="topic-modal-description" id="modal-topic-description"></p>
+            </div>
+
+            <div class="topic-two-columns">
+                <!-- Материалы -->
+                <div class="topic-section">
+                    <div class="section-header">
+                        <h3>Материалы</h3>
+                    </div>
+
+                    <div class="material-add-section">
+                        <div class="form-row">
+                            <input type="text" class="form-input" placeholder="Название ссылки" id="modal-link-title">
+                        </div>
+                        <div class="form-row">
+                            <input type="text" class="form-input" placeholder="https://example.com" id="modal-link-url">
+                        </div>
+                        <button class="btn" onclick="addLinkFromModal()" style="width: 100%; margin-bottom: 20px;">Добавить ссылку</button>
+                    </div>
+
+                    <div class="material-add-section">
+                        <div class="form-row">
+                            <input type="file" class="form-input" id="modal-topic-file" style="padding: 15px 24px;">
+                        </div>
+                        <button class="btn" onclick="uploadFileFromModal()" style="width: 100%;">Загрузить файл</button>
+                    </div>
+
+                    <div class="materials-list" id="modal-materials-list">
+                        <p class="empty-state">Загрузка...</p>
+                    </div>
+                </div>
+
+                <!-- Вопросы -->
+                <div class="topic-section">
+                    <div class="section-header">
+                        <h3>Вопросы</h3>
+                    </div>
+
+                    <div class="material-add-section">
+                        <div class="form-row" style="height: auto;">
+                            <textarea class="form-input" id="modal-questions-input" placeholder="Каждый вопрос с новой строки" style="height: 150px; padding: 20px 24px;"></textarea>
+                        </div>
+                        <button class="btn" onclick="addQuestionsFromModal()" style="width: 100%;">Добавить вопросы</button>
+                    </div>
+
+                    <div class="questions-list" id="modal-questions-list">
+                        <p class="empty-state">Загрузка...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Назначение темы -->
+            <div class="topic-assign-section">
+                <div class="section-header">
+                    <h3>Назначение темы</h3>
+                </div>
+
+                <div class="assign-two-columns">
+                    <div class="assign-column">
+                        <div class="assign-column-title">Классы</div>
+                        <div class="assign-list" id="modal-classes-assign-list"></div>
+                    </div>
+
+                    <div class="assign-column">
+                        <div class="assign-column-title">Ученики</div>
+                        <div class="assign-list" id="modal-students-assign-list"></div>
+                    </div>
+                </div>
+
+                <div class="assign-btn-wrapper">
+                    <button class="add-btn" onclick="assignTopicFromModal()" style="width: auto; padding: 0 60px; margin-top: 30px;">Назначить тему</button>
+                </div>
+            </div>
+
+            <div class="nav-buttons" style="margin-top: 30px;">
+                <button class="nav-btn" onclick="closeModal('topic-info-modal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/teacher.js"></script>
     <script>
-        function showSection(section) {
-            document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
-            document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+        let currentClassId = null;
+        let currentClassName = '';
+        let lastGeneratedStudents = [];
+        let selectedClassIds = new Set();
+        let selectedStudentNumbers = new Set();
+        let currentAssignTopicId = null;
+        let currentAssignTopicTitle = '';
 
-            if (section === "rating") {
-                document.getElementById("ratingSection").classList.add("active");
-                document.getElementById("ratingBtn").classList.add("active");
-            }
+        // ==================== НАВИГАЦИЯ ====================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+                document.getElementById(tab + '-panel').classList.add('active');
+                
+                if (tab === 'rating') renderRatings();
+                else if (tab === 'themes') renderThemes();
+                else if (tab === 'classes') renderClasses();
+            });
+        });
 
-            if (section === "themes") {
-                document.getElementById("themesSection").classList.add("active");
-                document.getElementById("themesBtn").classList.add("active");
-            }
-
-            if (section === "classes") {
-                document.getElementById("classesSection").classList.add("active");
-                document.getElementById("classesBtn").classList.add("active");
-            }
-        }
-
+        // ==================== МОДАЛЬНЫЕ ОКНА ====================
         function openModal(id) {
-            document.getElementById(id).style.display = "flex";
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal(id) {
-            document.getElementById(id).style.display = "none";
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+            if (id === 'assign-topic-modal') {
+                selectedClassIds.clear();
+                selectedStudentNumbers.clear();
+            }
         }
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
 
         function openThemeModal() {
-            document.getElementById("themeTitle").value = "";
-            document.getElementById("themeDescription").value = "";
-            openModal("themeModal");
+            document.getElementById('theme-title').value = '';
+            document.getElementById('theme-description').value = '';
+            openModal('theme-modal');
         }
 
-        function openClassModal() {
-            document.getElementById("className").value = "";
-            openModal("classModal");
+        function openAddClassModal() {
+            document.getElementById('class-name-input').value = '';
+            document.getElementById('students-count').value = '0';
+            openModal('add-class-modal');
         }
 
+        // ==================== РЕЙТИНГ ====================
         async function renderRatings() {
             try {
                 const data = await loadTeacherRatings();
-                const container = document.getElementById("ratingList");
-                container.innerHTML = "";
-
+                const container = document.getElementById('rating-list');
                 if (!data.items || !data.items.length) {
-                    container.innerHTML = "<p>Рейтинг пока пуст</p>";
+                    container.innerHTML = '<p class="empty-state">Рейтинг пока пуст</p>';
                     return;
                 }
-
-                data.items.forEach(item => {
-                    const row = document.createElement("div");
-                    row.className = "list-item";
-                    row.textContent = `Ученик ${item.student_number}`;
-                    container.appendChild(row);
-                });
+                container.innerHTML = data.items.map(item => `
+                    <div class="card">
+                        <span class="card-title">Ученик ${item.student_number}</span>
+                        <div class="card-actions">
+                            <button class="btn" onclick="openClassRating(${item.class_id})">Рейтинг класса</button>
+                        </div>
+                    </div>
+                `).join('');
             } catch (error) {
-                document.getElementById("ratingList").innerHTML = `<p>${error.message}</p>`;
+                document.getElementById('rating-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
             }
         }
 
-        async function renderTopics() {
+        function loadOverallRating() { alert('Общий рейтинг'); }
+        function openClassRating(classId) { alert('Рейтинг класса ' + classId); }
+
+        // ==================== ТЕМЫ ====================
+        // Глобальные переменные для модального окна темы
+        let currentModalTopicId = null;
+        let modalSelectedClassIds = new Set();
+        let modalSelectedStudentNumbers = new Set();
+
+        // ==================== ОТКРЫТИЕ МОДАЛКИ ТЕМЫ ====================
+        async function openTopicInfoModal(topicId) {
+            currentModalTopicId = topicId;
+            modalSelectedClassIds.clear();
+            modalSelectedStudentNumbers.clear();
+            
+            // Загружаем данные темы
+            try {
+                const topic = await loadTeacherTopic(topicId);
+                document.getElementById('modal-topic-title').textContent = topic.title;
+                document.getElementById('modal-topic-description').textContent = topic.description || '';
+            } catch (error) {
+                alert('Ошибка загрузки темы: ' + error.message);
+            }
+            
+            // Загружаем материалы, вопросы и данные для назначения
+            await renderModalMaterials();
+            await renderModalQuestions();
+            await renderModalAssignmentData();
+            
+            openModal('topic-info-modal');
+        }
+
+        // ==================== ТЕМЫ (ОСНОВНЫЕ ФУНКЦИИ) ====================
+        async function renderThemes() {
             try {
                 const topics = await loadTeacherTopics();
-                const grid = document.getElementById("themesGrid");
-                grid.innerHTML = "";
-
+                const container = document.getElementById('themes-list');
                 if (!topics.length) {
-                    grid.innerHTML = "<p>Тем пока нет</p>";
+                    container.innerHTML = '<p class="empty-state">Тем пока нет</p>';
                     return;
                 }
-
-                topics.forEach(topic => {
-                    const card = document.createElement("div");
-                    card.className = "theme-card";
-                    card.innerHTML = `
-                        <span class="theme-name">${topic.title}</span>
-                        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                            <button type="button" onclick="openTopic(${topic.id})">Открыть</button>
-                            <button type="button" onclick="removeTopic(${topic.id})">Удалить</button>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
+                container.innerHTML = topics.map(topic => `
+                <div class="card">
+                    <span class="card-title">${topic.title}</span>
+                    <div class="card-actions">
+                        <button class="btn" onclick="openTopicInfoModal(${topic.id})">Инфо</button>
+                        <button class="btn" onclick="deleteTopic(${topic.id})">Удалить</button>
+                    </div>
+                </div>
+            `).join('');
             } catch (error) {
-                document.getElementById("themesGrid").innerHTML = `<p>${error.message}</p>`;
-            }
-        }
-
-        async function renderClasses() {
-            try {
-                const classes = await loadTeacherClasses();
-                const grid = document.getElementById("classesGrid");
-                grid.innerHTML = "";
-
-                if (!classes.length) {
-                    grid.innerHTML = "<p>Классов пока нет</p>";
-                    return;
-                }
-
-                classes.forEach(item => {
-                    const card = document.createElement("div");
-                    card.className = "theme-card";
-                    card.innerHTML = `
-                        <span class="theme-name">${item.name}</span>
-                        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                            <button type="button" onclick="openClassPage(${item.id})">Открыть</button>
-                            <button type="button" onclick="removeClass(${item.id})">Удалить</button>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (error) {
-                document.getElementById("classesGrid").innerHTML = `<p>${error.message}</p>`;
+                document.getElementById('themes-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
             }
         }
 
         async function createTheme() {
-            const title = document.getElementById("themeTitle").value.trim();
-            const description = document.getElementById("themeDescription").value.trim();
-
-            if (!title) {
-                alert("Введите название темы");
-                return;
-            }
-
+            const title = document.getElementById('theme-title').value.trim();
+            const description = document.getElementById('theme-description').value.trim();
+            if (!title) { alert('Введите название темы'); return; }
             try {
                 await createTeacherTopic(title, description || null);
-                closeModal("themeModal");
-                await renderTopics();
+                closeModal('theme-modal');
+                await renderThemes();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function deleteTopic(topicId) {
+            if (!confirm('Удалить тему?')) return;
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://127.0.0.1:8000/teacher/topics/${topicId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления');
+                }
+                
+                // Успешно удалена — обновляем список
+                await renderThemes();
             } catch (error) {
-                alert(error.message);
+                alert('Не удалось удалить тему');
             }
         }
 
-        async function removeTopic(topicId) {
-            if (!confirm("Удалить тему?")) {
-                return;
-            }
+        // ==================== НАЗНАЧЕНИЕ ТЕМЫ (ОТДЕЛЬНОЕ МОДАЛЬНОЕ ОКНО) ====================
+        function openAssignTopicModal(topicId, topicTitle) {
+            currentAssignTopicId = topicId;
+            currentAssignTopicTitle = topicTitle;
+            selectedClassIds.clear();
+            selectedStudentNumbers.clear();
+            document.getElementById('assign-topic-header').textContent = `Назначить тему: ${topicTitle}`;
+            renderAssignmentData();
+            openModal('assign-topic-modal');
+        }
 
+        async function renderAssignmentData() {
             try {
-                await deleteTeacherTopic(topicId);
-                await renderTopics();
+                const classes = await loadTeacherClasses();
+                const classesContainer = document.getElementById('classes-assign-list');
+                const studentsContainer = document.getElementById('students-assign-list');
+                classesContainer.innerHTML = '';
+                studentsContainer.innerHTML = '';
+                if (!classes.length) {
+                    classesContainer.innerHTML = '<p class="empty-state">Нет созданных классов</p>';
+                    studentsContainer.innerHTML = '<p class="empty-state">Нет учеников</p>';
+                    return;
+                }
+                for (const classroom of classes) {
+                    const classItem = document.createElement('div');
+                    classItem.className = 'assign-class-item';
+                    classItem.onclick = () => toggleClassSelection(classroom.id, classItem);
+                    classItem.innerHTML = `
+                        <input type="checkbox" class="assign-item-checkbox" ${selectedClassIds.has(classroom.id) ? 'checked' : ''}>
+                        <span class="assign-item-text">${classroom.name}</span>
+                    `;
+                    classesContainer.appendChild(classItem);
+                    try {
+                        const students = await loadTeacherClassStudents(classroom.id);
+                        students.forEach(student => {
+                            const studentItem = document.createElement('div');
+                            studentItem.className = 'assign-student-item';
+                            studentItem.onclick = () => toggleStudentSelection(student.student_number, studentItem);
+                            studentItem.innerHTML = `
+                                <input type="checkbox" class="assign-item-checkbox" ${selectedStudentNumbers.has(student.student_number) ? 'checked' : ''}>
+                                <span class="assign-item-text">${student.student_number} (${classroom.name})</span>
+                            `;
+                            studentsContainer.appendChild(studentItem);
+                        });
+                    } catch (error) {}
+                }
             } catch (error) {
-                alert(error.message);
+                document.getElementById('classes-assign-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
             }
         }
 
-        async function createClass() {
-            const name = document.getElementById("className").value.trim();
+        function toggleClassSelection(classId, element) {
+            if (selectedClassIds.has(classId)) {
+                selectedClassIds.delete(classId);
+                element.classList.remove('selected');
+                element.querySelector('.assign-item-checkbox').checked = false;
+            } else {
+                selectedClassIds.add(classId);
+                element.classList.add('selected');
+                element.querySelector('.assign-item-checkbox').checked = true;
+            }
+        }
 
-            if (!name) {
-                alert("Введите название класса");
+        function toggleStudentSelection(studentNumber, element) {
+            if (selectedStudentNumbers.has(studentNumber)) {
+                selectedStudentNumbers.delete(studentNumber);
+                element.classList.remove('selected');
+                element.querySelector('.assign-item-checkbox').checked = false;
+            } else {
+                selectedStudentNumbers.add(studentNumber);
+                element.classList.add('selected');
+                element.querySelector('.assign-item-checkbox').checked = true;
+            }
+        }
+
+        async function confirmAssignTopic() {
+            if (!currentAssignTopicId) { alert('Тема не выбрана'); return; }
+            if (selectedClassIds.size === 0 && selectedStudentNumbers.size === 0) {
+                alert('Выберите хотя бы один класс или ученика');
                 return;
             }
-
             try {
-                await createTeacherClass(name);
-                closeModal("classModal");
+                await assignTeacherTopic(
+                    currentAssignTopicId,
+                    Array.from(selectedClassIds),
+                    Array.from(selectedStudentNumbers)
+                );
+                alert(`Тема "${currentAssignTopicTitle}" успешно назначена!`);
+                closeModal('assign-topic-modal');
+            } catch (error) {
+                alert('Ошибка назначения темы: ' + error.message);
+            }
+        }
+
+        // ==================== МАТЕРИАЛЫ В МОДАЛКЕ ====================
+        async function renderModalMaterials() {
+            if (!currentModalTopicId) return;
+            try {
+                const materials = await loadTeacherTopicMaterials(currentModalTopicId);
+                const container = document.getElementById('modal-materials-list');
+                container.innerHTML = '';
+                if (!materials.length) {
+                    container.innerHTML = '<p class="empty-state">Материалов пока нет</p>';
+                    return;
+                }
+                materials.forEach(material => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item-card';
+                    const text = material.material_type === 'link'
+                        ? `${material.title || 'Ссылка'}: ${material.url || ''}`
+                        : `${material.title || 'Файл'}`;
+                    item.innerHTML = `
+                        <span class="item-text">${text}</span>
+                        <button class="delete-small-btn" onclick="removeMaterialFromModal(${material.id})">Удалить</button>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                document.getElementById('modal-materials-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
+            }
+        }
+
+        async function addLinkFromModal() {
+            if (!currentModalTopicId) { alert('Тема не выбрана'); return; }
+            const title = document.getElementById('modal-link-title').value.trim();
+            const url = document.getElementById('modal-link-url').value.trim();
+            if (!url) { alert('Введите ссылку'); return; }
+            try {
+                await addTeacherTopicLink(currentModalTopicId, title || null, url);
+                document.getElementById('modal-link-title').value = '';
+                document.getElementById('modal-link-url').value = '';
+                await renderModalMaterials();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function uploadFileFromModal() {
+            if (!currentModalTopicId) { alert('Тема не выбрана'); return; }
+            const fileInput = document.getElementById('modal-topic-file');
+            const file = fileInput.files[0];
+            if (!file) { alert('Выберите файл'); return; }
+            try {
+                await uploadTeacherTopicFile(currentModalTopicId, file);
+                fileInput.value = '';
+                await renderModalMaterials();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function removeMaterialFromModal(materialId) {
+            if (!confirm('Удалить материал?')) return;
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://127.0.0.1:8000/teacher/materials/${materialId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления');
+                }
+                
+                // Успешно удален — обновляем список
+                await renderModalMaterials();
+            } catch (error) {
+                alert('Не удалось удалить материал');
+            }
+        }
+
+        // ==================== ВОПРОСЫ В МОДАЛКЕ ====================
+        async function renderModalQuestions() {
+            if (!currentModalTopicId) return;
+            try {
+                const questions = await loadTeacherTopicQuestions(currentModalTopicId);
+                const container = document.getElementById('modal-questions-list');
+                container.innerHTML = '';
+                if (!questions.length) {
+                    container.innerHTML = '<p class="empty-state">Вопросов пока нет</p>';
+                    return;
+                }
+                questions.forEach(question => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item-card';
+                    item.innerHTML = `
+                        <span class="item-text">${question.text}</span>
+                        <button class="delete-small-btn" onclick="removeQuestionFromModal(${question.id})">Удалить</button>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                document.getElementById('modal-questions-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
+            }
+        }
+
+        async function addQuestionsFromModal() {
+            if (!currentModalTopicId) { alert('Тема не выбрана'); return; }
+            const text = document.getElementById('modal-questions-input').value.trim();
+            if (!text) { alert('Введите хотя бы один вопрос'); return; }
+            const questions = text.split('\n').map(t => t.trim()).filter(Boolean).map(t => ({ text: t }));
+            if (!questions.length) { alert('Нет корректных вопросов'); return; }
+            try {
+                await addTeacherTopicQuestions(currentModalTopicId, questions);
+                document.getElementById('modal-questions-input').value = '';
+                await renderModalQuestions();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function removeQuestionFromModal(questionId) {
+            if (!confirm('Удалить вопрос?')) return;
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://127.0.0.1:8000/teacher/questions/${questionId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления');
+                }
+                
+                // Успешно удален — обновляем список
+                await renderModalQuestions();
+            } catch (error) {
+                alert('Не удалось удалить вопрос');
+            }
+        }
+
+        // ==================== НАЗНАЧЕНИЕ В МОДАЛКЕ ====================
+        async function renderModalAssignmentData() {
+            if (!currentModalTopicId) return;
+            try {
+                const assignments = await loadTopicAssignments(currentModalTopicId);
+                
+                modalSelectedClassIds.clear();
+                modalSelectedStudentNumbers.clear();
+                
+                if (assignments.assigned_class_ids) {
+                    assignments.assigned_class_ids.forEach(id => modalSelectedClassIds.add(id));
+                }
+                if (assignments.assigned_student_numbers) {
+                    assignments.assigned_student_numbers.forEach(num => modalSelectedStudentNumbers.add(num));
+                }
+                
+                const classes = await loadTeacherClasses();
+                const classesContainer = document.getElementById('modal-classes-assign-list');
+                const studentsContainer = document.getElementById('modal-students-assign-list');
+                classesContainer.innerHTML = '';
+                studentsContainer.innerHTML = '';
+                
+                if (!classes.length) {
+                    classesContainer.innerHTML = '<p class="empty-state">Нет классов</p>';
+                    studentsContainer.innerHTML = '<p class="empty-state">Нет учеников</p>';
+                    return;
+                }
+                
+                for (const classroom of classes) {
+                    const classItem = document.createElement('div');
+                    classItem.className = 'assign-item';
+                    if (modalSelectedClassIds.has(classroom.id)) {
+                        classItem.classList.add('selected');
+                    }
+                    classItem.onclick = () => toggleModalClassSelection(classroom.id, classItem);
+                    classItem.innerHTML = `
+                        <input type="checkbox" class="assign-checkbox" ${modalSelectedClassIds.has(classroom.id) ? 'checked' : ''}>
+                        <span class="assign-text">${classroom.name}</span>
+                    `;
+                    classesContainer.appendChild(classItem);
+                    
+                    try {
+                        const students = await loadTeacherClassStudents(classroom.id);
+                        students.forEach(student => {
+                            const studentItem = document.createElement('div');
+                            studentItem.className = 'assign-item';
+                            if (modalSelectedStudentNumbers.has(student.student_number)) {
+                                studentItem.classList.add('selected');
+                            }
+                            studentItem.onclick = () => toggleModalStudentSelection(student.student_number, studentItem);
+                            studentItem.innerHTML = `
+                                <input type="checkbox" class="assign-checkbox" ${modalSelectedStudentNumbers.has(student.student_number) ? 'checked' : ''}>
+                                <span class="assign-text">${student.student_number} (${classroom.name})</span>
+                            `;
+                            studentsContainer.appendChild(studentItem);
+                        });
+                    } catch (error) {}
+                }
+            } catch (error) {
+                document.getElementById('modal-classes-assign-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
+                document.getElementById('modal-students-assign-list').innerHTML = `<p class="empty-state">${error.message}</p>`;
+            }
+        }
+
+        function toggleModalClassSelection(classId, element) {
+            if (modalSelectedClassIds.has(classId)) {
+                modalSelectedClassIds.delete(classId);
+                element.classList.remove('selected');
+                element.querySelector('.assign-checkbox').checked = false;
+            } else {
+                modalSelectedClassIds.add(classId);
+                element.classList.add('selected');
+                element.querySelector('.assign-checkbox').checked = true;
+            }
+        }
+
+        function toggleModalStudentSelection(studentNumber, element) {
+            if (modalSelectedStudentNumbers.has(studentNumber)) {
+                modalSelectedStudentNumbers.delete(studentNumber);
+                element.classList.remove('selected');
+                element.querySelector('.assign-checkbox').checked = false;
+            } else {
+                modalSelectedStudentNumbers.add(studentNumber);
+                element.classList.add('selected');
+                element.querySelector('.assign-checkbox').checked = true;
+            }
+        }
+
+        async function assignTopicFromModal() {
+            if (!currentModalTopicId) { alert('Тема не выбрана'); return; }
+            if (modalSelectedClassIds.size === 0 && modalSelectedStudentNumbers.size === 0) {
+                alert('Выберите хотя бы один класс или ученика');
+                return;
+            }
+            try {
+                await assignTeacherTopic(
+                    currentModalTopicId,
+                    Array.from(modalSelectedClassIds),
+                    Array.from(modalSelectedStudentNumbers)
+                );
+                alert('Тема успешно назначена!');
+                modalSelectedClassIds.clear();
+                modalSelectedStudentNumbers.clear();
+            } catch (error) { alert(error.message); }
+        }
+
+        // ==================== КЛАССЫ ====================
+        async function renderClasses() {
+            try {
+                const classes = await loadTeacherClasses();
+                const container = document.getElementById('classes-list');
+                if (!classes || classes.length === 0) {
+                    container.innerHTML = '<p class="empty-state">Нет созданных классов</p>';
+                    return;
+                }
+                container.innerHTML = classes.map(cls => `
+                    <div class="card">
+                        <span class="card-title">${cls.name}</span>
+                        <div class="card-actions">
+                            <button class="btn" onclick="openClassInfo(${cls.id}, '${cls.name}')">Инфо</button>
+                            <button class="btn" onclick="deleteClass(${cls.id}, '${cls.name}')">Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                alert('Не удалось загрузить классы: ' + error.message);
+            }
+        }
+
+        async function confirmAddClass() {
+            const className = document.getElementById('class-name-input').value.trim();
+            const studentsCount = parseInt(document.getElementById('students-count').value) || 0;
+            if (!className) { alert('Введите название класса'); return; }
+            try {
+                await createTeacherClass(className);
+                if (studentsCount > 0) {
+                    const classes = await loadTeacherClasses();
+                    const newClassId = classes[0]?.id;
+                    if (newClassId) {
+                        const result = await generateTeacherStudents(newClassId, studentsCount);
+                        const students = result.students || [];
+                        showStudentsCreatedModal(students, className, studentsCount);
+                    }
+                } else {
+                    alert(`Класс "${className}" успешно создан`);
+                }
+                closeModal('add-class-modal');
                 await renderClasses();
             } catch (error) {
-                alert(error.message);
+                alert('Ошибка создания класса: ' + error.message);
             }
         }
 
-        async function removeClass(classId) {
-            if (!confirm("Удалить класс?")) {
-                return;
-            }
-
+        async function openClassInfo(classId, className) {
+            currentClassId = classId;
+            currentClassName = className;
+            document.getElementById('class-info-header').textContent = className;
+            document.getElementById('add-students-header').textContent = `Класс: ${className}`;
             try {
-                await deleteTeacherClass(classId);
-                await renderClasses();
+                const students = await loadTeacherClassStudents(classId);
+                const container = document.getElementById('students-in-class');
+                if (!students || students.length === 0) {
+                    container.innerHTML = '<p class="empty-state">В классе нет учеников</p>';
+                } else {
+                    container.innerHTML = students.map(student => `
+                        <div class="student-card">
+                            <div class="student-info">
+                                <span class="student-field">Логин: ${student.student_number}</span>
+                            </div>
+                            <button class="delete-small-btn" onclick="deleteStudentFromClass(${student.id})">Удалить</button>
+                        </div>
+                    `).join('');
+                    lastGeneratedStudents = students;
+                }
+                openModal('class-info-modal');
             } catch (error) {
-                alert(error.message);
+                alert('Не удалось загрузить учеников: ' + error.message);
             }
         }
 
-        function openTopic(topicId) {
-            localStorage.setItem("selected_teacher_topic_id", String(topicId));
-            window.location.href = "/static/pages/teacher_topic.html";
+        async function deleteClass(classId, className) {
+            if (!confirm(`Удалить класс "${className}"?`)) return;
+            try {
+                const token = localStorage.getItem('access_token');
+                await fetch(`http://127.0.0.1:8000/teacher/classes/${classId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                await renderClasses();
+            } catch (error) { alert('Не удалось удалить класс'); }
         }
 
-        function openClassPage(classId) {
-            localStorage.setItem("selected_teacher_class_id", String(classId));
-            window.location.href = "/static/pages/teacher_class.html";
+        async function deleteStudentFromClass(studentId) {
+            if (!confirm('Удалить ученика?')) return;
+            try {
+                const token = localStorage.getItem('access_token');
+                await fetch(`http://127.0.0.1:8000/teacher/students/${studentId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (currentClassId) await openClassInfo(currentClassId, currentClassName);
+            } catch (error) { alert('Не удалось удалить ученика'); }
         }
 
-        async function initPage() {
-            await renderRatings();
-            await renderTopics();
-            await renderClasses();
+        function openAddStudentsBatchModal() {
+            if (!currentClassId) { alert('Класс не выбран'); return; }
+            openModal('add-students-batch-modal');
         }
 
-        initPage();
+        async function confirmAddStudentsBatch() {
+            const count = parseInt(document.getElementById('add-students-count').value);
+            if (!count || count < 1 || count > 50) { alert('Введите количество от 1 до 50'); return; }
+            if (!currentClassName) { alert('Класс не выбран'); return; }
+            try {
+                const result = await generateTeacherStudents(currentClassId, count);
+                const students = result.students || [];
+                showStudentsCreatedModal(students, currentClassName, count);
+                closeModal('add-students-batch-modal');
+                if (currentClassId) await openClassInfo(currentClassId, currentClassName);
+            } catch (error) {
+                alert('Не удалось добавить учеников: ' + error.message);
+            }
+        }
+
+        function showStudentsCreatedModal(students, className, count) {
+            currentClassName = className;
+            lastGeneratedStudents = students;
+            document.getElementById('students-created-count').textContent = `${count} учеников добавлено в класс "${className}"`;
+            const container = document.getElementById('students-credentials-list');
+            container.innerHTML = students.map(s => `
+                <div class="student-credential-item">
+                    <span class="student-credential-login">${s.student_number}</span>
+                    <span class="student-credential-password">${s.password}</span>
+                </div>
+            `).join('');
+            openModal('students-created-modal');
+        }
+
+        function closeStudentsCreatedModal() { closeModal('students-created-modal'); }
+
+        function copyAllStudentsCredentials() {
+            if (!lastGeneratedStudents.length) { alert('Нет данных'); return; }
+            const text = lastGeneratedStudents.map(s => `Логин: ${s.student_number} | Пароль: ${s.password}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                const notification = document.createElement('div');
+                notification.className = 'copy-success';
+                notification.textContent = 'Данные скопированы!';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            });
+        }
+
+        function downloadClassList() {
+            if (!lastGeneratedStudents.length) { alert('Нет данных'); return; }
+            const text = lastGeneratedStudents.map((s, i) => `${i+1}. Логин: ${s.student_number} | Пароль: ${s.password || 'не указан'}`).join('\n');
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `students_${currentClassName}_credentials.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        renderRatings();
+        renderThemes();
+        renderClasses();
     </script>
 </body>
 </html>
