@@ -8,7 +8,7 @@ from app.models.topic_assignment import TopicAssignment
 from app.models.topic_dialog_message import TopicDialogMessage
 from app.models.topic_question import TopicQuestion
 from app.models.student import Student
-from app.services.ai_service import build_topic_context, build_prompt, call_llm
+from app.services.ai_service import build_topic_context, build_prompt, ask_deepseek
 
 
 def get_student_topics(db: Session, student_id: int) -> list[dict]:
@@ -82,7 +82,7 @@ def ask_question(db: Session, student: Student, topic_id: int, question_id: int)
 
     context = build_topic_context(topic)
     prompt = build_prompt(topic.title, context, cast(str, question.text))
-    answer = call_llm(prompt)
+    answer = ask_deepseek(prompt)
 
     message = TopicDialogMessage(
         topic_id=topic.id,
