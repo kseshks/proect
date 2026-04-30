@@ -14,32 +14,41 @@
         }
 
         body {
-            position: relative;
-            width: 1440px;
-            height: 1024px;
+            min-height: 100vh;
             background: #A7AADB;
             font-family: 'Inter', 'Segoe UI', sans-serif;
-            margin: 0 auto;
-            overflow: hidden;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            padding: 40px 20px;
+            
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1440px;
         }
 
         .logo-wrapper {
-            box-sizing: border-box;
-            position: absolute;
             width: 100px;
             height: 100px;
-            left: 669px;
-            top: 254px;
             background: #FFFFFF;
             border: 3px solid #797FE0;
             border-radius: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 24px; 
         }
 
         .logo-svg {
-            position: relative;
             width: 61px;
             height: 52px;
         }
@@ -50,24 +59,22 @@
         }
 
         .login-card {
-            box-sizing: border-box;
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            left: 520px;
-            top: 378px;
+            width: 100%;
+            max-width: 400px; 
             background: #FFFFFF;
             border: 5px solid #797FE0;
             border-radius: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 42px;
+            padding: 42px 20px 10px 20px;
+            box-sizing: border-box;
         }
 
         .btn {
             box-sizing: border-box;
-            width: 333px;
+            width: 100%;
+            max-width: 333px;
             height: 60px;
             background: #A7AADB;
             border: 1px solid #13164B;
@@ -85,17 +92,10 @@
             cursor: pointer;
             outline: none;
             transition: background 0.2s ease;
+            margin: 0 auto;
         }
 
-        .btn:nth-of-type(1) {
-            margin-top: 0;
-        }
-
-        .btn:nth-of-type(2) {
-            margin-top: 50px;
-        }
-
-        .btn:nth-of-type(3) {
+        .btn:not(:first-of-type) {
             margin-top: 50px;
         }
 
@@ -109,38 +109,68 @@
         }
 
         .footer {
-            position: absolute;
-            width: 255px;
-            height: 56px;
-            left: 145px;
-            bottom: 0;
             font-family: 'Inter', sans-serif;
             font-style: normal;
             font-weight: 400;
-            font-size: 16px;
-            line-height: 19px;
+            font-size: 14px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: right;
+            justify-content: right;
             text-align: center;
             color: #071B40;
+            margin: 30px 80px 0 0;
+            width: 100%;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 15px;
+            }
+            
+            .login-card {
+                padding: 30px 15px 25px 15px;
+            }
+            
+            .btn {
+                height: 55px;
+                font-size: 14px;
+            }
+            
+            .btn:not(:first-of-type) {
+                margin-top: 35px;
+            }
+            
+            .footer {
+                margin-top: 35px;
+                font-size: 14px;
+            }
+            
+            .logo-wrapper {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 20px;
+            }
+            
+            .logo-svg {
+                width: 48px;
+                height: 42px;
+            }
         }
     </style>
 </head>
 <body>
-
-    <div class="logo-wrapper">
-        <svg class="logo-svg" width="61" height="56" viewBox="0 0 61 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3.15517 1H0M3.15517 1H6.66092M3.15517 1L9.6408 14L16.1264 27L22.6121 40M57.4943 1H61M57.4943 1H53.9885M57.4943 1L50.3951 14L43.296 27L36.1968 40M22.6121 40L29.0977 53L36.1968 40M22.6121 40L22 1M22.6121 40H28M22.6121 40H17M22 1H28M22 1H17M36.1968 40H42M36.1968 40H33V20.5M42 1H33V20.5M33 20.5H42" stroke="#13164B" stroke-width="2"/>
-        </svg>
+    <div class="content">
+        <div class="logo-wrapper">
+            <svg class="logo-svg" width="61" height="56" viewBox="0 0 61 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.15517 1H0M3.15517 1H6.66092M3.15517 1L9.6408 14L16.1264 27L22.6121 40M57.4943 1H61M57.4943 1H53.9885M57.4943 1L50.3951 14L43.296 27L36.1968 40M22.6121 40L29.0977 53L36.1968 40M22.6121 40L22 1M22.6121 40H28M22.6121 40H17M22 1H28M22 1H17M36.1968 40H42M36.1968 40H33V20.5M42 1H33V20.5M33 20.5H42" stroke="#13164B" stroke-width="2"/>
+            </svg>
+        </div>
+        <div class="login-card">
+            <button class="btn" onclick="location.href='pages/teacher_login.html'">Войти как учитель</button>
+            <button class="btn" onclick="location.href='pages/student_login.html'">Войти как ученик</button>
+            <button class="btn" onclick="location.href='pages/admin_login.html'">Войти как администратор</button>
+            <div class="footer">Made by Vie</div>
+        </div>
     </div>
-
-    <div class="login-card">
-        <button class="btn" onclick="location.href='pages/teacher_login.html'">Войти как учитель</button>
-        <button class="btn" onclick="location.href='pages/student_login.html'">Войти как ученик</button>
-        <button class="btn" onclick="location.href='pages/admin_login.html'">Войти как администратор</button>
-        <div class="footer">Made by Vie</div>
-    </div>
-
 </body>
 </html>
