@@ -105,7 +105,7 @@ def ask_custom_question(db: Session, student: Student, topic_id: int, question_t
 
     context = build_topic_context(topic)
     prompt = build_prompt(topic.title, context, question_text)
-    answer = call_llm(prompt)
+    answer = ask_deepseek(prompt, context=context, question_text=question_text)
 
     message = TopicDialogMessage(
         topic_id=topic.id,
