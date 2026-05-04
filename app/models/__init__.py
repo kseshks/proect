@@ -2,6 +2,8 @@ from .admin import Admin
 from .teacher import Teacher
 from .classroom import ClassRoom
 from .student import Student
+from .section import Section
+from .section_assignment import SectionAssignment
 from .topic import Topic
 from .topic_material import TopicMaterial
 from .topic_question import TopicQuestion
@@ -13,6 +15,8 @@ __all__ = [
     "Teacher",
     "ClassRoom",
     "Student",
+    "Section",
+    "SectionAssignment",
     "Topic",
     "TopicMaterial",
     "TopicQuestion",

@@ -14,3 +14,8 @@ class Student(Base):
     classroom = relationship("ClassRoom", back_populates="students")
     assignments = relationship("TopicAssignment", back_populates="student", cascade="all, delete-orphan")
     dialog_messages = relationship("TopicDialogMessage", back_populates="student", cascade="all, delete-orphan")
+    section_assignments = relationship(
+        "SectionAssignment",
+        back_populates="student",
+        cascade="all, delete-orphan"
+    )

@@ -12,3 +12,4 @@ class Teacher(Base):
 
     classes = relationship("ClassRoom", back_populates="teacher")
     topics = relationship("Topic", back_populates="teacher", cascade="all, delete-orphan")
+    sections = relationship("Section", back_populates="teacher", cascade="all, delete-orphan")

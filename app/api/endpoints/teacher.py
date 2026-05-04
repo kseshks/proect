@@ -1,9 +1,19 @@
 from fastapi import APIRouter, Depends, File, UploadFile, status
 from sqlalchemy.orm import Session
 
+from app.schemas.section import SectionCreateRequest, SectionResponse
+from app.services.section_service import (
+    assign_section,
+    create_section,
+    create_topic_in_section,
+    delete_section,
+    get_section_topics,
+    get_teacher_section_or_404,
+    get_teacher_sections,
+)
 from app.api.dependencies import require_teacher
 from app.core.database import get_db
-from app.schemas.classroom import ClassCreateRequest, ClassResponse  # ← ВОТ ЭТО ДОБАВИТЬ
+from app.schemas.classroom import ClassCreateRequest
 from app.schemas.student import TeacherStudentsGenerateRequest
 from app.schemas.topic import (
     MaterialLinkCreateRequest,
@@ -213,3 +223,80 @@ def teacher_topic_assignments(
 ):
     from app.services.teacher_service import get_topic_assignments
     return get_topic_assignments(db, teacher.id, topic_id)
+
+
+@router.get("/sections", response_model=list[SectionResponse])
+def teacher_sections(
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    return get_teacher_sections(db, teacher.id)
+
+
+@router.post("/sections", response_model=SectionResponse, status_code=status.HTTP_201_CREATED)
+def teacher_create_section(
+    data: SectionCreateRequest,
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    return create_section(db, teacher.id, data.title, data.description)
+
+
+@router.get("/sections/{section_id}", response_model=SectionResponse)
+def teacher_section(
+    section_id: int,
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    return get_teacher_section_or_404(db, teacher.id, section_id)
+
+
+@router.delete("/sections/{section_id}", status_code=status.HTTP_204_NO_CONTENT)
+def teacher_delete_section(
+    section_id: int,
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    delete_section(db, teacher.id, section_id)
+    return None
+
+
+@router.get("/sections/{section_id}/topics", response_model=list[TopicResponse])
+def teacher_section_topics(
+    section_id: int,
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    return get_section_topics(db, teacher.id, section_id)
+
+
+@router.post("/sections/{section_id}/topics", response_model=TopicResponse, status_code=status.HTTP_201_CREATED)
+def teacher_create_topic_in_section(
+    section_id: int,
+    data: TopicCreateRequest,
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    return create_topic_in_section(
+        db,
+        teacher.id,
+        section_id,
+        data.title,
+        data.description
+    )
+
+
+@router.post("/sections/{section_id}/assign")
+def teacher_assign_section(
+    section_id: int,
+    data: AssignTopicRequest,
+    db: Session = Depends(get_db),
+    teacher=Depends(require_teacher)
+):
+    return assign_section(
+        db,
+        teacher,
+        section_id,
+        data.class_ids,
+        data.student_numbers
+    )
