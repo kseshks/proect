@@ -1077,3 +1077,34 @@ textarea.form-input {
 .scrollbar-visual {
     display: none !important;
 }
+
+.topic-modal-header {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 30px !important;
+    max-width: 100% !important;
+}
+
+.topic-title-input {
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    padding: 15px 0 !important;
+    outline: none !important;
+    color: #13164B !important;
+    text-align: center !important;
+    border-radius: 0 !important;
+}
+
+.topic-title-input::placeholder {
+    color: rgba(19, 22, 75, 0.5) !important;
+    font-style: italic;
+}
+
+.topic-save-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}

@@ -8,12 +8,12 @@
 </head>
 <body>
     <div class="themes-container">
-        <div class="themes-wrapper" id="topics-list">
-            <!-- Темы будут загружены через JavaScript -->
+        <div class="themes-wrapper" id="sections-list">
+            <!-- Разделы и темы будут загружены через JavaScript -->
         </div>
     </div>
 
-    <button class="start-btn" id="start-topic-btn">Начать</button>
+    <button class="start-btn" id="start-topic-btn" disabled>Начать</button>
 
     <div class="footer">
         <p>Made by Vie</p>
@@ -25,41 +25,167 @@
     <script>
         let selectedTopicId = null;
 
-        async function renderTopics() {
+        async function renderSectionsWithTopics() {
             try {
-                const topics = await loadStudentTopics();
-                const container = document.getElementById("topics-list");
-                container.innerHTML = "";
+                const container = document.getElementById("sections-list");
+                container.innerHTML = '<div class="empty-state">Загрузка...</div>';
 
-                if (!topics.length) {
+                // Получаем все назначенные темы ученика
+                const assignedTopics = await loadStudentTopics();
+                
+                if (!assignedTopics || !assignedTopics.length) {
                     container.innerHTML = '<div class="empty-state">Нет доступных тем</div>';
                     return;
                 }
 
-                topics.forEach(topic => {
-                    const card = document.createElement("div");
-                    card.className = "theme-card";
-                    card.innerHTML = `
-                        <span class="theme-title">${topic.title}</span>
-                        <button class="select-btn" data-topic-id="${topic.id}" onclick="selectTopic(${topic.id}, this)">Выбрать</button>
+                // Получаем все разделы, которые назначены ученику
+                const assignedSections = await loadStudentSections();
+                
+                // Создаем Map: section_id -> { section данные, topics: [], isFullSection: bool }
+                const sectionsMap = new Map();
+
+                // 1. Добавляем разделы, которые назначены целиком
+                if (assignedSections && assignedSections.length > 0) {
+                    for (const section of assignedSections) {
+                        sectionsMap.set(section.id, {
+                            id: section.id,
+                            title: section.title || section.name,
+                            topics: [],
+                            isFullSection: true // Весь раздел назначен
+                        });
+                        
+                        // Загружаем ВСЕ темы этого раздела
+                        try {
+                            const allSectionTopics = await loadSectionTopics(section.id);
+                            if (allSectionTopics && allSectionTopics.length > 0) {
+                                sectionsMap.get(section.id).topics = allSectionTopics;
+                            }
+                        } catch(e) {
+                            console.error(`Ошибка загрузки тем раздела ${section.id}:`, e);
+                        }
+                    }
+                }
+
+                // 2. Добавляем отдельно назначенные темы
+                for (const topic of assignedTopics) {
+                    const sectionId = topic.section_id;
+                    
+                    if (sectionsMap.has(sectionId)) {
+                        // Раздел уже есть (назначен целиком) - все темы уже загружены
+                        if (!sectionsMap.get(sectionId).isFullSection) {
+                            // Раздел не назначен целиком - добавляем тему, если её ещё нет
+                            const existingTopics = sectionsMap.get(sectionId).topics;
+                            if (!existingTopics.find(t => t.id === topic.id)) {
+                                existingTopics.push(topic);
+                            }
+                        }
+                    } else {
+                        // Раздела нет в Map - создаем новую запись
+                        const topicSectionTitle = topic.section_title || `Раздел`;
+                        
+                        sectionsMap.set(sectionId, {
+                            id: sectionId,
+                            title: topicSectionTitle,
+                            topics: [topic],
+                            isFullSection: false // Только отдельные темы
+                        });
+                    }
+                }
+
+                // Проверяем, есть ли разделы для отображения
+                if (sectionsMap.size === 0) {
+                    container.innerHTML = '<div class="empty-state">Нет доступных разделов</div>';
+                    return;
+                }
+
+                // Сортируем разделы по названию
+                const sortedSections = Array.from(sectionsMap.values())
+                    .sort((a, b) => a.title.localeCompare(b.title));
+
+                container.innerHTML = '';
+
+                // Создаем карточки разделов
+                let isFirst = true;
+                sortedSections.forEach(section => {
+                    const sectionCard = document.createElement("div");
+                    sectionCard.className = "section-card";
+                    
+                    // Автоматически раскрываем первый раздел
+                    if (isFirst) {
+                        sectionCard.classList.add("expanded");
+                        isFirst = false;
+                    }
+                    
+                    // Заголовок раздела
+                    const sectionHeader = document.createElement("div");
+                    sectionHeader.className = "section-header";
+                    sectionHeader.onclick = function() {
+                        sectionCard.classList.toggle("expanded");
+                    };
+                    
+                    sectionHeader.innerHTML = `
+                        <span class="section-title">${section.title}</span>
+                        <div class="section-info">
+                            <span class="section-arrow">▶</span>
+                        </div>
                     `;
-                    container.appendChild(card);
+                    
+                    // Список тем
+                    const topicsList = document.createElement("div");
+                    topicsList.className = "topics-list";
+                    
+                    if (section.topics.length > 0) {
+                        // Сортируем темы по названию
+                        section.topics
+                            .sort((a, b) => a.title.localeCompare(b.title))
+                            .forEach(topic => {
+                                const topicItem = document.createElement("div");
+                                topicItem.className = "topic-item";
+                                topicItem.innerHTML = `
+                                    <span class="topic-title">${topic.title}</span>
+                                    <button class="select-btn" 
+                                            data-topic-id="${topic.id}" 
+                                            onclick="selectTopic(${topic.id}, this, event)">
+                                        Выбрать
+                                    </button>
+                                `;
+                                topicsList.appendChild(topicItem);
+                            });
+                    } else {
+                        topicsList.innerHTML = '<div class="empty-state">Нет тем в этом разделе</div>';
+                    }
+                    
+                    sectionCard.appendChild(sectionHeader);
+                    sectionCard.appendChild(topicsList);
+                    container.appendChild(sectionCard);
                 });
+                
             } catch (error) {
-                document.getElementById("topics-list").innerHTML = 
+                console.error('Ошибка загрузки:', error);
+                document.getElementById("sections-list").innerHTML = 
                     `<div class="empty-state">Ошибка загрузки: ${error.message}</div>`;
             }
         }
 
-        function selectTopic(topicId, btn) {
+        function selectTopic(topicId, btn, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            // Убираем выделение со всех кнопок
             document.querySelectorAll('.select-btn').forEach(b => {
                 b.classList.remove('selected');
             });
             
-            // Добавляем класс selected текущей кнопке
+            // Выделяем текущую кнопку
             btn.classList.add('selected');
             selectedTopicId = topicId;
+            
+            // Сохраняем выбранную тему
             setSelectedTopic(topicId);
+            
+            // Активируем кнопку "Начать"
+            document.getElementById("start-topic-btn").disabled = false;
         }
 
         document.getElementById("start-topic-btn").addEventListener("click", function () {
@@ -73,7 +199,8 @@
             window.location.href = "student_dialog.html";
         });
 
-        renderTopics();
+        // Запускаем загрузку
+        renderSectionsWithTopics();
     </script>
 </body>
 </html>

@@ -133,3 +133,20 @@ async function deleteTeacherQuestion(questionId) {
 async function loadTopicAssignments(topicId) {
     return apiRequest(`/teacher/topics/${topicId}/assignments`);
 }
+
+// Разделы
+async function loadTeacherSections() {
+    return apiRequest("/teacher/sections");
+}
+async function createTeacherSection(title, description) {
+    return apiRequest("/teacher/sections", { method: "POST", body: JSON.stringify({ title, description }) });
+}
+async function loadSectionTopics(sectionId) {
+    return apiRequest(`/teacher/sections/${sectionId}/topics`);
+}
+async function createTopicInSection(sectionId, title, description) {
+    return apiRequest(`/teacher/sections/${sectionId}/topics`, { method: "POST", body: JSON.stringify({ title, description }) });
+}
+async function assignSection(sectionId, classIds, studentNumbers) {
+    return apiRequest(`/teacher/sections/${sectionId}/assign`, { method: "POST", body: JSON.stringify({ class_ids: classIds, student_numbers: studentNumbers }) });
+}

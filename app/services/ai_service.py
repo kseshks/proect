@@ -50,16 +50,16 @@ def build_prompt(topic_title: str, context: str, question_text: str) -> str:
 
 
 def ask_deepseek(topic_title: str, context: str, question_text: str) -> str:
-    prompt = build_prompt(topic_title, context, question_text)
+     prompt = build_prompt(topic_title, context, question_text)
 
-    response = client.chat.completions.create(
-        model=settings.DEEPSEEK_MODEL,
-        messages=[
-            {"role": "system", "content": "Ты полезный и аккуратный учебный помощник."},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.2,
-        max_tokens=1200,
-    )
+     response = client.chat.completions.create(
+         model=settings.DEEPSEEK_MODEL,
+         messages=[
+             {"role": "system", "content": "Ты полезный и аккуратный учебный помощник."},
+             {"role": "user", "content": prompt},
+         ],
+         temperature=0.2,
+         max_tokens=1200,
+     )
 
-    return response.choices[0].message.content or ""
+     return response.choices[0].message.content or ""

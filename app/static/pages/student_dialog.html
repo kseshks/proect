@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Диалог с ИИ</title>
+    <title>Диалог c ИИ</title>
     <link rel="stylesheet" href="student_dialog.css">
 </head>
 <body>
@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <!-- Правая колонка: диалог + поле ввода -->
+            <!-- Правая колонка: диалог -->
             <div class="chat-panel">
                 <div class="panel-header">
                     <h2>Диалог</h2>
@@ -34,25 +34,14 @@
                 
                 <!-- История сообщений -->
                 <div class="chat-messages" id="chat-messages">
-                    <p class="empty-state">Задайте вопрос нейрорепетитору</p>
-                </div>
-
-                <!-- Поле ввода своего вопроса -->
-                <div class="chat-input-section">
-                    <div class="chat-input-wrapper">
-                        <input type="text" 
-                               class="chat-input" 
-                               id="custom-question" 
-                               placeholder="Задайте свой вопрос...">
-                        <button class="chat-send-btn" onclick="sendCustomQuestion()">Задать вопрос</button>
-                    </div>
+                    <p class="empty-state">Выберите вопрос из списка слева</p>
                 </div>
             </div>
         </div>
 
         <!-- Кнопка назад -->
         <div class="dialog-footer">
-            <button class="back-btn" onclick="goBack()">← Назад</button>
+            <button class="back-btn" onclick="goBack()">← Назад к темам</button>
         </div>
 
         <!-- Footer -->
@@ -82,8 +71,12 @@
                 return;
             }
 
+            console.log("Загрузка темы:", currentTopicId);
+
             try {
                 const topic = await loadStudentTopic(currentTopicId);
+                console.log("Тема загружена:", topic);
+                
                 document.getElementById("topic-title").textContent = topic.title;
 
                 const questionsContainer = document.getElementById("questions-list");
@@ -102,6 +95,7 @@
                     questionsContainer.appendChild(btn);
                 });
             } catch (error) {
+                console.error("Ошибка загрузки темы:", error);
                 document.getElementById("questions-list").innerHTML = 
                     `<p class="empty-state">Ошибка: ${error.message}</p>`;
             }
@@ -117,71 +111,90 @@
                 container.innerHTML = "";
 
                 if (!messages || messages.length === 0) {
-                    container.innerHTML = '<p class="empty-state">Задайте вопрос нейрорепетитору</p>';
+                    container.innerHTML = '<p class="empty-state">Выберите вопрос из списка слева</p>';
                     return;
                 }
 
                 messages.forEach(message => {
                     const messageDiv = document.createElement("div");
                     messageDiv.className = "chat-message";
-                    messageDiv.innerHTML = `
-                        <div class="message-question">
-                            <span class="message-label">Вопрос:</span>
-                            <span class="message-text">${message.question_text}</span>
-                        </div>
-                        <div class="message-answer">
-                            <span class="message-label">Ответ:</span>
-                            <span class="message-text">${message.answer_text}</span>
-                        </div>
+                    
+                    // Вопрос
+                    const questionDiv = document.createElement("div");
+                    questionDiv.className = "message-question";
+                    questionDiv.innerHTML = `
+                        <span class="message-label">❓ Вопрос:</span>
+                        <span class="message-text">${message.question_text}</span>
                     `;
+                    
+                    // Ответ
+                    const answerDiv = document.createElement("div");
+                    answerDiv.className = "message-answer";
+                    
+                    if (message.answer_text) {
+                        answerDiv.innerHTML = `
+                            <span class="message-label">🤖 Ответ:</span>
+                            <span class="message-text">${message.answer_text}</span>
+                        `;
+                    } else {
+                        answerDiv.innerHTML = `
+                            <span class="message-label">🤖 Ответ:</span>
+                            <span class="message-text" style="opacity:0.6;">Ожидание ответа...</span>
+                        `;
+                    }
+                    
+                    messageDiv.appendChild(questionDiv);
+                    messageDiv.appendChild(answerDiv);
                     container.appendChild(messageDiv);
                 });
 
                 container.scrollTop = container.scrollHeight;
             } catch (error) {
+                console.error("Ошибка загрузки диалога:", error);
                 document.getElementById("chat-messages").innerHTML = 
-                    `<p class="empty-state">Ошибка загрузки диалога</p>`;
+                    `<p class="empty-state">Ошибка загрузки диалога: ${error.message}</p>`;
             }
         }
 
         // ==================== ОТПРАВКА ВОПРОСА ====================
         async function sendQuestion(questionId) {
-            if (!currentTopicId) return;
-
-            try {
-                await askStudentQuestion(currentTopicId, questionId);
-                await renderDialog();
-            } catch (error) {
-                alert("Ошибка: " + error.message);
-            }
-        }
-
-        // ==================== ОТПРАВКА СВОЕГО ВОПРОСА ====================
-        async function sendCustomQuestion() {
-            const input = document.getElementById("custom-question");
-            const questionText = input.value.trim();
-
-            if (!questionText) {
-                alert("Введите вопрос");
-                return;
-            }
-
             if (!currentTopicId) {
                 alert("Тема не выбрана");
                 return;
             }
 
+            console.log("Отправка вопроса:", { topicId: currentTopicId, questionId });
+
             try {
-                await askCustomQuestion(currentTopicId, questionText);
-                input.value = "";
+                // Показываем, что вопрос отправляется
+                const container = document.getElementById("chat-messages");
+                const loadingDiv = document.createElement("div");
+                loadingDiv.className = "chat-message";
+                loadingDiv.innerHTML = `
+                    <div class="message-question">
+                        <span class="message-label">❓ Вопрос отправлен...</span>
+                    </div>
+                    <div class="message-answer">
+                        <span class="message-text" style="opacity:0.6;">Нейрорепетитор думает...</span>
+                    </div>
+                `;
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+
+                const result = await askStudentQuestion(currentTopicId, questionId);
+                console.log("Ответ получен:", result);
+                
+                // Перезагружаем диалог
                 await renderDialog();
             } catch (error) {
-                alert("Ошибка: " + error.message);
+                console.error("Ошибка отправки вопроса:", error);
+                alert("Не удалось отправить вопрос. Проверьте подключение к серверу.");
             }
         }
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         async function initPage() {
+            console.log("Инициализация страницы диалога");
             await renderTopic();
             await renderDialog();
         }

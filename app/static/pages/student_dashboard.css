@@ -378,3 +378,157 @@ body {
         max-height: 55vh;
     }
 }
+
+
+.themes-container {
+    width: 100%;
+    max-width: 800px;
+    flex: 1;
+}
+
+.section-card {
+    background: white;
+    border: 3px solid #13164B;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.section-header:hover {
+    background: #f0f4ff;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #13164B;
+}
+
+.section-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.section-badge {
+    font-size: 14px;
+    color: #13164B;
+    opacity: 0.6;
+}
+
+.section-arrow {
+    font-size: 24px;
+    transition: transform 0.3s;
+    color: #13164B;
+}
+
+.section-card.expanded .section-arrow {
+    transform: rotate(90deg);
+}
+
+.topics-list {
+    display: none;
+    padding: 0 30px 20px;
+}
+
+.section-card.expanded .topics-list {
+    display: block;
+}
+
+.topic-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #DDE8FB;
+    border: 2px solid #13164B;
+    border-radius: 20px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+}
+
+.topic-item:last-child {
+    margin-bottom: 0;
+}
+
+.topic-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #13164B;
+}
+
+.select-btn {
+    height: 38px;
+    padding: 0 20px;
+    background: white;
+    border: 2px solid #13164B;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #13164B;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.select-btn:hover {
+    background: #c8d8f5;
+    transform: translateY(-1px);
+}
+
+.select-btn.selected {
+    background: #13164B;
+    color: white;
+    border-color: #13164B;
+}
+
+.start-btn {
+    width: 300px;
+    height: 64px;
+    margin-top: 20px;
+    background: white;
+    border: 3px solid #13164B;
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #13164B;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.start-btn:hover:not(:disabled) {
+    background: #f0f4ff;
+    box-shadow: 0 4px 12px rgba(19, 22, 75, 0.15);
+}
+
+.start-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #13164B;
+    opacity: 0.7;
+}
+
+.footer {
+    margin-top: auto;
+    padding: 20px;
+    font-size: 16px;
+    color: #13164B;
+}
+
+.footer p {
+    margin: 0;
+}

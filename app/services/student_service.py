@@ -22,7 +22,12 @@ def get_student_topics(db: Session, student_id: int) -> list[dict]:
 
     for assignment in topic_assignments:
         topic = assignment.topic
-        topics_by_id[topic.id] = topic
+        topics_by_id[topic.id] = {
+            "id": topic.id,
+            "title": topic.title,
+            "section_id": topic.section_id,
+            "section_title": topic.section.title if topic.section else "Без раздела"
+        }
 
     # 2. Темы из назначенных разделов
     section_assignments = db.query(SectionAssignment).filter(
@@ -31,21 +36,57 @@ def get_student_topics(db: Session, student_id: int) -> list[dict]:
 
     for assignment in section_assignments:
         section = assignment.section
-
         for topic in section.topics:
-            topics_by_id[topic.id] = topic
+            if topic.id not in topics_by_id:
+                topics_by_id[topic.id] = {
+                    "id": topic.id,
+                    "title": topic.title,
+                    "section_id": topic.section_id,
+                    "section_title": section.title
+                }
 
-    result = []
+    return list(topics_by_id.values())
 
-    for topic in topics_by_id.values():
-        result.append({
-            "id": topic.id,
-            "title": topic.title,
-            "description": topic.description,
-            "section_id": topic.section_id
-        })
+def get_student_sections(db: Session, student_id: int) -> list[dict]:
+    """Возвращает разделы, назначенные ученику целиком"""
+    assignments = db.query(SectionAssignment).filter(
+        SectionAssignment.student_id == student_id
+    ).all()
+    
+    return [
+        {
+            "id": a.section.id,
+            "title": a.section.title,
+            "name": a.section.title
+        }
+        for a in assignments
+    ]
 
-    return result
+
+def get_section_topics_for_student(db: Session, student_id: int, section_id: int) -> list[dict]:
+    """Возвращает все темы раздела (если раздел назначен ученику)"""
+    # Проверяем доступ
+    assignment = db.query(SectionAssignment).filter(
+        SectionAssignment.student_id == student_id,
+        SectionAssignment.section_id == section_id
+    ).first()
+    
+    if not assignment:
+        raise HTTPException(status_code=403, detail="Раздел не назначен")
+    
+    topics = db.query(Topic).filter(
+        Topic.section_id == section_id
+    ).order_by(Topic.title).all()
+    
+    return [
+        {
+            "id": t.id,
+            "title": t.title,
+            "section_id": t.section_id,
+            "section_title": assignment.section.title
+        }
+        for t in topics
+    ]
 
 
 def get_student_topic_or_404(db: Session, student: Student, topic_id: int) -> Topic:
