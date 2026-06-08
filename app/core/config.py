@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     OPENROUTER_API_KEY: str
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
-    OPENROUTER_MODEL: str = "nvidia/nemotron-3.5-content-safety:free"
+    OPENROUTER_MODEL: str = "meta-llama/llama-3.2-3b-instruct:free"
 
 
 settings = Settings()
