@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     ROLE_TEACHER: str = "teacher"
     ROLE_STUDENT: str = "student"
 
-    DEEPSEEK_API_KEY: str
-    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
-    DEEPSEEK_MODEL: str = "deepseek-chat"
+    OPENROUTER_API_KEY: str
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_MODEL: str = "nvidia/nemotron-3.5-content-safety:free"
 
 
 settings = Settings()

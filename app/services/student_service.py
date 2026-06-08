@@ -9,7 +9,7 @@ from app.models.topic_assignment import TopicAssignment
 from app.models.topic_dialog_message import TopicDialogMessage
 from app.models.topic_question import TopicQuestion
 from app.models.student import Student
-from app.services.ai_service import build_topic_context, ask_deepseek
+from app.services.ai_service import build_topic_context, ask_nemotron
 
 
 def get_student_topics(db: Session, student_id: int) -> list[dict]:
@@ -159,10 +159,10 @@ def ask_question(db: Session, student: Student, topic_id: int, question_id: int)
 
     context = build_topic_context(topic)
 
-    answer = ask_deepseek(
-        topic_title=topic.title,
-        context=context,
-        question_text=cast(str, question.text)
+    answer = ask_nemotron(
+    topic_title=topic.title,
+    context=context,
+    question_text=cast(str, question.text)
     )
 
     message = TopicDialogMessage(
