@@ -9,7 +9,7 @@ from app.models.topic_assignment import TopicAssignment
 from app.models.topic_dialog_message import TopicDialogMessage
 from app.models.topic_question import TopicQuestion
 from app.models.student import Student
-from app.services.ai_service import build_topic_context, ask_nemotron
+from app.services.ai_service import build_topic_context, ask_ai
 
 
 def get_student_topics(db: Session, student_id: int) -> list[dict]:
@@ -128,7 +128,7 @@ def get_student_topic_detail(db: Session, student: Student, topic_id: int) -> di
         "title": topic.title,
         "description": topic.description,
         "materials": topic.materials,
-        "questions": topic.questions  # ← Убрал сортировку по sort_order и is_active
+        "questions": topic.questions
     }
 
 
