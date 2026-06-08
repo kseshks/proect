@@ -18,15 +18,12 @@ def build_topic_context(topic: Topic, max_chars: int = 12000) -> str:
             continue
         if not material.extracted_text:
             continue
-
         text = material.extracted_text.strip()
         if not text:
             continue
-
         remaining = max_chars - current_length
         if remaining <= 0:
             break
-
         chunk = text[:remaining]
         parts.append(chunk)
         current_length += len(chunk)
@@ -53,14 +50,23 @@ def build_prompt(topic_title: str, context: str, question_text: str) -> str:
 def ask_nemotron(topic_title: str, context: str, question_text: str) -> str:
     prompt = build_prompt(topic_title, context, question_text)
 
-    response = client.chat.completions.create(
-        model=settings.OPENROUTER_MODEL,
-        messages=[
-            {"role": "system", "content": "Ты полезный и аккуратный учебный помощник. Отвечай только на русском языке."},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.2,
-        max_tokens=1200,
-    )
+    try:
+        response = client.chat.completions.create(
+            model=settings.OPENROUTER_MODEL,
+            messages=[
+                {"role": "system", "content": "Ты полезный учебный помощник. Отвечай на русском языке."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.3,
+            max_tokens=1200,
+        )
 
-    return response.choices[0].message.content or ""
+        if response and response.choices and len(response.choices) > 0:
+            choice = response.choices[0]
+            if choice.message and choice.message.content:
+                return choice.message.content
+
+        return "Модель не вернула ответ. Попробуйте ещё раз."
+
+    except Exception as e:
+        return f"Ошибка при запросе к ИИ: {str(e)}"
