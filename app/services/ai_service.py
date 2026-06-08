@@ -10,22 +10,20 @@ openrouter_client = OpenAI(
 
 MODELS = [
     # Быстрые
-    {"name": "Gemma 3 1B", "model": "google/gemma-3-1b-it:free"},
-    {"name": "Llama 3.2 3B", "model": "meta-llama/llama-3.2-3b-instruct:free"},
-    {"name": "Phi-3 Mini", "model": "microsoft/phi-3-mini-128k-instruct:free"},
+    {"name": "Nemotron Nano 9B", "model": "nvidia/nemotron-nano-9b-v2:free"},
+    {"name": "Liquid LFM 2.5", "model": "liquid/lfm-2.5-1.2b-instruct:free"},
+    {"name": "GPT-OSS 20B", "model": "openai/gpt-oss-20b:free"},
     
     # Средние
-    {"name": "Gemma 3 4B", "model": "google/gemma-3-4b-it:free"},
-    {"name": "Qwen 2.5 7B", "model": "qwen/qwen-2.5-7b-instruct:free"},
-    {"name": "Liquid LFM 7B", "model": "liquid/lfm-7b:free"},
+    {"name": "Gemma 4 31B", "model": "google/gemma-4-31b-it:free"},
+    {"name": "Qwen 3 Next 80B", "model": "qwen/qwen3-next-80b-a3b-instruct:free"},
+    {"name": "GLM-4.5 Air", "model": "z-ai/glm-4.5-air:free"},
     
-    # Медленные
-    {"name": "Gemma 3 12B", "model": "google/gemma-3-12b-it:free"},
-    {"name": "Phi-3 Medium", "model": "microsoft/phi-3-medium-128k-instruct:free"},
-    {"name": "Mistral Nemo", "model": "mistralai/mistral-nemo:free"},
-    
-    # Самый умный, но медленный
-    {"name": "Nemotron 3 Ultra", "model": "nvidia/nemotron-3-ultra-550b-a55b:free"},
+    # Мощные
+    {"name": "Gemma 4 26B", "model": "google/gemma-4-26b-a4b-it:free"},
+    {"name": "Nemotron Super 120B", "model": "nvidia/nemotron-3-super-120b-a12b:free"},
+    {"name": "GPT-OSS 120B", "model": "openai/gpt-oss-120b:free"},
+    {"name": "Kimi K2.6", "model": "moonshotai/kimi-k2.6:free"},
 ]
 
 def build_topic_context(topic: Topic, max_chars: int = 12000) -> str:
