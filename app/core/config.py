@@ -16,10 +16,10 @@ class Settings(BaseSettings):
     ROLE_ADMIN: str = "admin"
     ROLE_TEACHER: str = "teacher"
     ROLE_STUDENT: str = "student"
-
-    OPENROUTER_API_KEY: str
+    
+    # OpenRouter
+    OPENROUTER_API_KEY: str = ""
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
-    OPENROUTER_MODEL: str = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 
 settings = Settings()

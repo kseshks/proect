@@ -159,7 +159,7 @@ def ask_question(db: Session, student: Student, topic_id: int, question_id: int)
 
     context = build_topic_context(topic)
 
-    answer = ask_nemotron(
+    answer = ask_ai(
     topic_title=topic.title,
     context=context,
     question_text=cast(str, question.text)
