@@ -9,11 +9,24 @@ openrouter_client = OpenAI(
 )
 
 MODELS = [
+    # Быстрые
     {"name": "Gemma 3 1B", "model": "google/gemma-3-1b-it:free"},
+    {"name": "Llama 3.2 3B", "model": "meta-llama/llama-3.2-3b-instruct:free"},
+    {"name": "Phi-3 Mini", "model": "microsoft/phi-3-mini-128k-instruct:free"},
+    
+    # Средние
+    {"name": "Gemma 3 4B", "model": "google/gemma-3-4b-it:free"},
     {"name": "Qwen 2.5 7B", "model": "qwen/qwen-2.5-7b-instruct:free"},
     {"name": "Liquid LFM 7B", "model": "liquid/lfm-7b:free"},
+    
+    # Медленные
+    {"name": "Gemma 3 12B", "model": "google/gemma-3-12b-it:free"},
+    {"name": "Phi-3 Medium", "model": "microsoft/phi-3-medium-128k-instruct:free"},
+    {"name": "Mistral Nemo", "model": "mistralai/mistral-nemo:free"},
+    
+    # Самый умный, но медленный
+    {"name": "Nemotron 3 Ultra", "model": "nvidia/nemotron-3-ultra-550b-a55b:free"},
 ]
-
 
 def build_topic_context(topic: Topic, max_chars: int = 12000) -> str:
     parts = []
