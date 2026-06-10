@@ -358,7 +358,7 @@
             if (!confirm('Удалить раздел?')) return;
             try {
                 const token = localStorage.getItem('access_token');
-                await fetch(`http://127.0.0.1:8000/teacher/sections/${id}`, { 
+                await fetch(`${window.location.origin}/teacher/sections/${id}`, { 
                     method:'DELETE', 
                     headers:{Authorization:`Bearer ${token}`} 
                 });
@@ -399,7 +399,7 @@
             if (!confirm('Удалить тему?')) return;
             try {
                 const token = localStorage.getItem('access_token');
-                await fetch(`http://127.0.0.1:8000/teacher/topics/${topicId}`, { 
+                await fetch(`${window.location.origin}/teacher/topics/${topicId}`, { 
                     method:'DELETE', 
                     headers:{Authorization:`Bearer ${token}`} 
                 });
@@ -669,8 +669,8 @@
             
             container.innerHTML = localMaterials.map((m, index) => {
                 let displayText = m.type === 'link' ? 
-                    `🔗 ${m.title}: ${m.url}` : 
-                    `📁 Файл: ${m.title}`;
+                    `${m.title}: ${m.url}` : 
+                    `Файл: ${m.title}`;
                 return `
                     <div class="list-item-card">
                         <span class="item-text">${displayText}</span>
@@ -689,7 +689,7 @@
             
             container.innerHTML = localQuestions.map((q, index) => `
                 <div class="list-item-card">
-                    <span class="item-text">❓ ${q.text}</span>
+                    <span class="item-text">${q.text}</span>
                     <button class="delete-small-btn" onclick="removeLocalQuestion(${index})">❌</button>
                 </div>`).join('');
         }
@@ -716,7 +716,7 @@
         async function removeTopicMaterialFromAPI(id) {
             try {
                 const token = localStorage.getItem('access_token');
-                await fetch(`http://127.0.0.1:8000/teacher/materials/${id}`, {
+                await fetch(`${window.location.origin}/teacher/materials/${id}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -728,7 +728,7 @@
         async function removeTopicQuestionFromAPI(id) {
             try {
                 const token = localStorage.getItem('access_token');
-                await fetch(`http://127.0.0.1:8000/teacher/questions/${id}`, {
+                await fetch(`${window.location.origin}/teacher/questions/${id}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -833,7 +833,7 @@
 
         async function updateExistingTopic(title) {
             const token = localStorage.getItem('access_token');
-            await fetch(`http://127.0.0.1:8000/teacher/topics/${currentTopicId}`, {
+            await fetch(`${window.location.origin}/teacher/topics/${currentTopicId}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -1040,7 +1040,7 @@
             if (!confirm(`Удалить класс "${className}"?`)) return;
             try { 
                 const token=localStorage.getItem('access_token'); 
-                await fetch(`http://127.0.0.1:8000/teacher/classes/${classId}`,{
+                await fetch(`${window.location.origin}/teacher/classes/${classId}`,{
                     method:'DELETE',
                     headers:{Authorization:`Bearer ${token}`}
                 }); 
@@ -1054,7 +1054,7 @@
             if (!confirm('Удалить ученика?')) return;
             try { 
                 const token=localStorage.getItem('access_token'); 
-                await fetch(`http://127.0.0.1:8000/teacher/students/${studentId}`,{
+                await fetch(`${window.location.origin}/teacher/students/${studentId}`,{
                     method:'DELETE',
                     headers:{Authorization:`Bearer ${token}`}
                 }); 
