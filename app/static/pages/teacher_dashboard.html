@@ -793,7 +793,35 @@
             
             try {
                 if (currentTopicId) {
+                    // Обновляем название
                     await updateExistingTopic(title);
+                    
+                    // Сохраняем новые материалы
+                    for (const material of localMaterials) {
+                        if (!material.id) {  // Только новые (без id)
+                            if (material.type === 'link') {
+                                await addTeacherTopicLink(currentTopicId, material.title, material.url);
+                            } else if (material.type === 'file') {
+                                await uploadTeacherTopicFile(currentTopicId, material.file);
+                            }
+                        }
+                    }
+                    
+                    // Сохраняем новые вопросы
+                    const newQuestions = localQuestions.filter(q => !q.id);
+                    if (newQuestions.length > 0) {
+                        await addTeacherTopicQuestions(currentTopicId, newQuestions);
+                    }
+                    
+                    // Обновляем назначения
+                    if (topicClassIds.size > 0 || topicStudentNumbers.size > 0) {
+                        await assignTeacherTopic(
+                            currentTopicId, 
+                            Array.from(topicClassIds), 
+                            Array.from(topicStudentNumbers)
+                        );
+                    }
+                    
                     alert('Раздел обновлён!');
                 } else {
                     const result = await createTopicInSection(currentSectionId, title, '');
