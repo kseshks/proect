@@ -18,6 +18,32 @@
     -webkit-font-smoothing: antialiased;
 }
 
+#topic-modal-header {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 30px !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+#topic-modal-header .topic-title-input {
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    border: 3px solid var(--primary) !important;
+    background: var(--white) !important;
+    width: 100% !important;
+    padding: 15px 20px !important;
+    outline: none !important;
+    color: #13164B !important;
+    text-align: center !important;
+    border-radius: 30px !important;
+}
+
+#topic-modal-header .topic-title-input:focus {
+    border-color: #ffd700 !important;
+}
+
 body {
     background: var(--bg-color);
     color: var(--primary);
