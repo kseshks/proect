@@ -322,7 +322,7 @@ body {
 
 .class-header {
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     height: 64px;
     background: var(--white);
     border: 3px solid var(--primary);
