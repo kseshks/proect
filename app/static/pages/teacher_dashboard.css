@@ -1,49 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-#section-info-header {
-    max-width: 700px !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 64px !important;
-    padding: 15px 20px !important;
-    font-size: 24px !important;
-    font-weight: 600 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-    background: var(--white) !important;
-    border: 3px solid var(--primary) !important;
-    border-radius: var(--radius-lg) !important;
-    color: var(--primary) !important;
-    text-align: center !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-bottom: 40px !important;
-}
-
-/* Стили для заголовка в модалке информации о разделе */
-#section-info-modal .class-header#section-info-header {
-    max-width: 700px !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 64px !important;
-    padding: 15px 20px !important;
-    font-size: 24px !important;
-    font-weight: 600 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-    background: var(--white) !important;
-    border: 3px solid var(--primary) !important;
-    border-radius: var(--radius-lg) !important;
-    color: var(--primary) !important;
-    text-align: center !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-bottom: 40px !important;
-    box-sizing: border-box !important;
-}
-
 :root {
     --bg-color: #A7AADB;
     --primary: #13164B;
@@ -366,7 +322,7 @@ body {
 
 .class-header {
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     height: 64px;
     background: var(--white);
     border: 3px solid var(--primary);
@@ -378,6 +334,50 @@ body {
     font-weight: 600;
     color: var(--primary);
     margin-bottom: 40px;
+}
+
+#section-info-header {
+    max-width: 700px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 64px !important;
+    padding: 15px 20px !important;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    background: var(--white) !important;
+    border: 3px solid var(--primary) !important;
+    border-radius: var(--radius-lg) !important;
+    color: var(--primary) !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 40px !important;
+}
+
+/* Стили для заголовка в модалке информации о разделе */
+#section-info-modal .class-header#section-info-header {
+    max-width: 700px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 64px !important;
+    padding: 15px 20px !important;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    background: var(--white) !important;
+    border: 3px solid var(--primary) !important;
+    border-radius: var(--radius-lg) !important;
+    color: var(--primary) !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 40px !important;
+    box-sizing: border-box !important;
 }
 
 .form-row {
